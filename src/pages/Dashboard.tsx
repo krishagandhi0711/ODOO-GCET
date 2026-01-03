@@ -3,38 +3,24 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { DashboardCard } from "@/components/DashboardCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { 
-  Clock, 
-  Calendar, 
-  TrendingUp, 
-  LogIn, 
+import {
+  Clock,
+  Calendar,
+  TrendingUp,
+  LogIn,
   LogOut,
   CheckCircle2
 } from "lucide-react";
 import { currentEmployee, todayAttendance, weeklyHours, leaveBalance } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 
+import { useAttendance } from "@/contexts/AttendanceContext";
+
 export default function Dashboard() {
-  const [isCheckedIn, setIsCheckedIn] = useState(todayAttendance.isCheckedIn);
-  const [checkInTime, setCheckInTime] = useState(todayAttendance.checkIn);
-  const [checkOutTime, setCheckOutTime] = useState<string | null>(todayAttendance.checkOut);
-  const [isLoading, setIsLoading] = useState(false);
+  const { isCheckedIn, checkInTime, checkOutTime, toggleCheckIn, isLoading } = useAttendance();
 
   const handleClockAction = async () => {
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    if (isCheckedIn) {
-      const now = new Date();
-      setCheckOutTime(now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }));
-      setIsCheckedIn(false);
-    } else {
-      const now = new Date();
-      setCheckInTime(now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }));
-      setCheckOutTime(null);
-      setIsCheckedIn(true);
-    }
-    setIsLoading(false);
+    await toggleCheckIn();
   };
 
   const getGreeting = () => {
@@ -49,16 +35,21 @@ export default function Dashboard() {
 
   return (
     <AppLayout title="Dashboard">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Welcome Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="space-y-8 animate-in fade-in duration-500">
+        {/* Welcome Section / Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/40 pb-6">
           <div>
-            <h2 className="text-2xl font-semibold text-foreground mb-1">
+            <h2 className="text-3xl font-bold text-foreground mb-1 tracking-tight">
               {getGreeting()}, {currentEmployee.firstName}
             </h2>
-            <p className="text-muted-foreground">Here's your work summary for today.</p>
+            <p className="text-muted-foreground font-medium">Here's your work summary for today.</p>
           </div>
-          <StatusBadge status={isCheckedIn ? "present" : "absent"} />
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:block text-right mr-2">
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Current Status</p>
+            </div>
+            <StatusBadge status={isCheckedIn ? "present" : "absent"} className="scale-110" />
+          </div>
         </div>
 
         {/* Main Cards Grid */}
@@ -73,8 +64,8 @@ export default function Dashboard() {
                 size="lg"
                 className={cn(
                   "w-full h-14 text-base font-medium transition-all duration-300",
-                  isCheckedIn 
-                    ? "bg-amber-500 hover:bg-amber-600 text-white" 
+                  isCheckedIn
+                    ? "bg-amber-500 hover:bg-amber-600 text-white"
                     : "bg-primary hover:bg-primary/90"
                 )}
               >

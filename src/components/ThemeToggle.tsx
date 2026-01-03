@@ -1,17 +1,57 @@
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "./ThemeProvider";
+import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) {
+    return <div className="h-10 w-20 rounded-full glass" />;
+  }
+
+  const isDark = theme === "dark";
 
   return (
     <button
-      onClick={toggleTheme}
-      className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-secondary-foreground transition-all duration-300 hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
-      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className={cn(
+        "relative h-10 w-20 rounded-full p-1 transition-all duration-500",
+        "glass hover:shadow-lg",
+        "group"
+      )}
     >
-      <Sun className={`h-4 w-4 absolute transition-all duration-300 ${theme === "light" ? "rotate-0 scale-100 opacity-100" : "rotate-90 scale-0 opacity-0"}`} />
-      <Moon className={`h-4 w-4 absolute transition-all duration-300 ${theme === "dark" ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0"}`} />
+      {/* Slider */}
+      <div
+        className={cn(
+          "absolute top-1 h-8 w-8 rounded-full transition-all duration-500",
+          "bg-gradient-to-br shadow-lg",
+          isDark
+            ? "left-11 from-indigo-500 to-purple-600"
+            : "left-1 from-amber-400 to-orange-500"
+        )}
+      >
+        {isDark ? (
+          <Moon className="h-4 w-4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white" />
+        ) : (
+          <Sun className="h-4 w-4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white" />
+        )}
+      </div>
+
+      {/* Icons in background */}
+      <div className="relative h-full flex items-center justify-between px-2">
+        <Sun className={cn(
+          "h-4 w-4 transition-all duration-500",
+          !isDark ? "opacity-0" : "opacity-40"
+        )} />
+        <Moon className={cn(
+          "h-4 w-4 transition-all duration-500",
+          isDark ? "opacity-0" : "opacity-40"
+        )} />
+      </div>
     </button>
   );
 }

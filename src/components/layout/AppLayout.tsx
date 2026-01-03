@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
-import { cn } from "@/lib/utils";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -9,24 +7,21 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children, title }: AppLayoutProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
   return (
-    <div className="min-h-screen bg-background transition-theme">
-      <Sidebar 
-        collapsed={sidebarCollapsed} 
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
-      />
-      <Header title={title} sidebarCollapsed={sidebarCollapsed} />
-      
-      <main
-        className={cn(
-          "pt-16 min-h-screen transition-all duration-300",
-          sidebarCollapsed ? "pl-16" : "pl-64"
-        )}
-      >
-        <div className="p-6 animate-fade-in">
-          {children}
+    <div className="h-screen w-screen bg-background text-foreground overflow-hidden">
+      {/* 1. Fixed Left Sidebar (Full Height, Z-50) */}
+      <Sidebar />
+
+      {/* 2. Fixed Top Navbar (Offset by Sidebar Width, Z-40) */}
+      <Header title={title} />
+
+      {/* 3. Independent Scrollable Main Content Area - FIXED positioning */}
+      <main className="fixed top-16 left-64 right-0 bottom-0 overflow-y-auto scroll-smooth bg-background/50">
+        <div className="container mx-auto p-8 max-w-7xl min-h-full pb-20">
+          {/* Page Transition & Content */}
+          <div className="page-enter space-y-8">
+            {children}
+          </div>
         </div>
       </main>
     </div>

@@ -4,9 +4,11 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { setRole } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,9 +39,14 @@ export default function Login() {
       return;
     }
 
+    // Determine role based on identifier (mock logic)
+    const isLoginAdmin = formData.identifier.toLowerCase().includes("admin");
+    const role = isLoginAdmin ? "admin" : "employee";
+    setRole(role);
+
     // Demo success
     setIsLoading(false);
-    navigate("/dashboard");
+    navigate(role === "admin" ? "/admin/dashboard" : "/dashboard");
   };
 
   return (

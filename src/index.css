@@ -1,108 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 @layer base {
   :root {
-    /* Dayflow Light Theme - Warm, calm, professional */
-    --background: 40 20% 98%;
-    --foreground: 220 15% 18%;
+    /* Dayflow Light Theme (Clean slate/corporate) */
+    --background: 210 20% 98%;
+    --foreground: 220 15% 15%;
 
-    --card: 40 15% 96%;
-    --card-foreground: 220 15% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 15%;
 
-    --popover: 40 15% 96%;
-    --popover-foreground: 220 15% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 15%;
 
-    --primary: 190 35% 42%;
+    --primary: 210 100% 50%;
+    /* Pure corporate blue */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 40 12% 92%;
+    --secondary: 210 20% 94%;
     --secondary-foreground: 220 15% 25%;
 
-    --muted: 40 10% 90%;
+    --muted: 210 15% 94%;
     --muted-foreground: 220 10% 45%;
 
-    --accent: 190 30% 94%;
-    --accent-foreground: 190 35% 35%;
+    --accent: 200 80% 55%;
+    /* Cyan accent */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 65% 55%;
+    --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 12% 88%;
-    --input: 40 12% 88%;
-    --ring: 190 35% 42%;
+    --border: 210 15% 88%;
+    --input: 210 15% 90%;
+    --ring: 210 100% 50%;
 
-    --radius: 0.625rem;
+    --radius: 0.5rem;
 
-    /* Sidebar - Light */
-    --sidebar-background: 40 15% 96%;
-    --sidebar-foreground: 220 15% 35%;
-    --sidebar-primary: 190 35% 42%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 190 25% 92%;
-    --sidebar-accent-foreground: 190 35% 35%;
-    --sidebar-border: 40 12% 88%;
-    --sidebar-ring: 190 35% 42%;
+    /* Glass tokens - Light */
+    --glass-bg: 255 255 255 / 0.9;
+    --glass-border: 210 20% 85%;
+    --glass-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 
-    /* Custom Dayflow tokens */
-    --surface: 40 18% 97%;
-    --surface-elevated: 0 0% 100%;
-    --text-primary: 220 15% 18%;
-    --text-secondary: 220 10% 45%;
-    --text-tertiary: 220 8% 60%;
-    --shadow-soft: 220 15% 75%;
+    /* Gradients specific to light mode (very subtle) */
+    --grad-1: 210 50% 96%;
+    --grad-2: 220 40% 95%;
+    --grad-3: 200 30% 97%;
   }
 
   .dark {
-    /* Dayflow Dark Theme - Deep slate, calm, no pure black */
-    --background: 220 20% 10%;
-    --foreground: 220 10% 88%;
+    /* Dayflow Space Theme (Enterprise Dark) */
 
-    --card: 220 18% 13%;
-    --card-foreground: 220 10% 88%;
+    /* Base: Deep Charcoal / Near-Black (#0b0f14 approx) */
+    --background: 222 25% 6%;
 
-    --popover: 220 18% 13%;
-    --popover-foreground: 220 10% 88%;
+    /* Text: Soft Off-white / Muted Gray */
+    --foreground: 220 15% 90%;
 
-    --primary: 190 40% 50%;
-    --primary-foreground: 220 20% 10%;
+    /* Surfaces: Gunmetal / Dark Slate */
+    --card: 220 20% 10%;
+    --card-foreground: 220 15% 90%;
 
-    --secondary: 220 15% 18%;
-    --secondary-foreground: 220 10% 80%;
+    --popover: 220 20% 10%;
+    --popover-foreground: 220 15% 90%;
 
-    --muted: 220 15% 16%;
-    --muted-foreground: 220 10% 55%;
+    /* Primary: Muted Electric Blue */
+    --primary: 210 85% 55%;
+    --primary-foreground: 222 25% 6%;
 
-    --accent: 190 25% 18%;
-    --accent-foreground: 190 40% 70%;
+    /* Secondary: Deep slate for secondary actions */
+    --secondary: 220 15% 14%;
+    --secondary-foreground: 220 10% 85%;
 
-    --destructive: 0 55% 45%;
+    /* Muted: Subtle separators/backgrounds */
+    --muted: 220 15% 12%;
+    --muted-foreground: 220 10% 60%;
+
+    /* Accent: Muted Cyan / Cool Blue */
+    --accent: 195 70% 50%;
+    --accent-foreground: 220 25% 6%;
+
+    --destructive: 0 60% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 18%;
-    --input: 220 15% 18%;
-    --ring: 190 40% 50%;
+    --border: 220 15% 16%;
+    --input: 220 15% 14%;
+    --ring: 210 85% 55%;
 
-    /* Sidebar - Dark */
-    --sidebar-background: 220 18% 11%;
-    --sidebar-foreground: 220 10% 70%;
-    --sidebar-primary: 190 40% 50%;
-    --sidebar-primary-foreground: 220 20% 10%;
-    --sidebar-accent: 190 20% 16%;
-    --sidebar-accent-foreground: 190 40% 70%;
-    --sidebar-border: 220 15% 16%;
-    --sidebar-ring: 190 40% 50%;
+    /* Glass tokens - Dark Enterprise */
+    --glass-bg: 15 20 26 / 0.8;
+    --glass-border: 220 15% 20%;
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 
-    /* Custom Dayflow tokens - Dark */
-    --surface: 220 18% 12%;
-    --surface-elevated: 220 16% 15%;
-    --text-primary: 220 10% 88%;
-    --text-secondary: 220 10% 60%;
-    --text-tertiary: 220 8% 45%;
-    --shadow-soft: 220 25% 5%;
+    /* Gradient Overlay Vars (HSL) */
+    --grad-1: 220 30% 12%;
+    /* Deep Navy */
+    --grad-2: 240 20% 10%;
+    /* Very Faint Slate/Violet */
+    --grad-3: 200 30% 9%;
+    /* Deep Cyan/Teal hint */
   }
 
   * {
@@ -110,33 +108,155 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply font-sans antialiased bg-background text-foreground;
     font-family: 'Inter', system-ui, sans-serif;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Deep Space Gradient Background (SUBTLE) */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background:
+      radial-gradient(circle at 15% 50%, hsl(var(--grad-1) / 0.45) 0%, transparent 55%),
+      radial-gradient(circle at 85% 30%, hsl(var(--grad-2) / 0.35) 0%, transparent 60%),
+      radial-gradient(circle at 50% 80%, hsl(var(--grad-3) / 0.25) 0%, transparent 50%);
+    /* Very slow slight movement */
+    animation: deepSpaceShift 60s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+
+  @keyframes deepSpaceShift {
+    0% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+
+    100% {
+      transform: scale(1.05);
+      opacity: 1;
+    }
   }
 }
 
 @layer utilities {
-  .transition-theme {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+
+  /* Controlled Premium Glass - Subtle & Professional */
+  .glass {
+    background: rgba(var(--glass-bg));
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      var(--glass-shadow),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    /* Soft inner glow */
+  }
+
+  .glass-strong {
+    background: rgba(var(--glass-bg));
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 0.5px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      var(--glass-shadow),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+    /* Highlight top edge */
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Page transitions */
+  .page-enter {
+    animation: pageEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes pageEnter {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Hover lift effect - Subtle */
+  .hover-lift {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Status pulse */
+  .status-pulse {
+    animation: statusPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes statusPulse {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Scrollbar hide utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
 
-/* Smooth scrollbar styling */
+/* Premium scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: hsl(var(--muted-foreground) / 0.3);
-  border-radius: 4px;
+  border-radius: 10px;
+  transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Text selection */
+::selection {
+  background: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
 }

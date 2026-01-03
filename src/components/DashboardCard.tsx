@@ -1,31 +1,40 @@
-import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface DashboardCardProps {
   title: string;
-  icon?: LucideIcon;
+  icon: LucideIcon;
   children: React.ReactNode;
   className?: string;
 }
 
-export function DashboardCard({ title, icon: Icon, children, className }: DashboardCardProps) {
+export function DashboardCard({
+  title,
+  icon: Icon,
+  children,
+  className,
+}: DashboardCardProps) {
   return (
     <div
       className={cn(
-        "bg-card rounded-xl border border-border p-6 shadow-soft",
-        "hover:shadow-soft-md transition-all duration-300 hover:-translate-y-0.5",
+        "glass rounded-2xl p-6 hover-lift transition-all duration-300",
         className
       )}
     >
-      <div className="flex items-center gap-2 mb-4">
-        {Icon && (
-          <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Icon className="h-4 w-4 text-primary" />
+      {/* Card Header */}
+      <div className="flex items-center gap-3 mb-5">
+        <div className="relative flex h-10 w-10 items-center justify-center">
+          {/* Icon glow */}
+          <div className="absolute inset-0 rounded-xl bg-primary/20 blur-md" />
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
+            <Icon className="h-5 w-5 text-primary" />
           </div>
-        )}
-        <h3 className="font-medium text-foreground">{title}</h3>
+        </div>
+        <h3 className="text-base font-semibold text-foreground">{title}</h3>
       </div>
-      {children}
+
+      {/* Card Content */}
+      <div>{children}</div>
     </div>
   );
 }
