@@ -83,8 +83,9 @@ export default function Profile() {
     );
   }
 
-  const fullName = `${employee.first_name} ${employee.last_name}`;
-  const initials = `${employee.first_name[0]}${employee.last_name[0]}`;
+  const fullName = `${employee.first_name || ''} ${employee.last_name || ''}`.trim();
+  const initials = `${employee.first_name?.[0] || 'U'}${employee.last_name?.[0] || 'N'}`;
+
 
   return (
     <AppLayout title="My Profile">
@@ -153,7 +154,7 @@ export default function Profile() {
                   <div className="flex items-center gap-3 text-sm">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                     <span className="text-foreground">
-                      Joined {new Date(employee.date_of_joining).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      Joined {employee.date_of_joining ? new Date(employee.date_of_joining).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A'}
                     </span>
                   </div>
                 </div>
@@ -300,134 +301,54 @@ function PersonalTab({ employee }: { employee: Employee }) {
   );
 }
 
-function ProfessionalTab() {
+function ProfessionalTab({ employee }: { employee: Employee }) {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
-        <InfoField label="Employee ID" value={currentEmployee.id} icon={User} />
-        <InfoField label="Job Title" value={currentEmployee.role} icon={Briefcase} />
-        <InfoField label="Department" value={currentEmployee.department} icon={Building} />
-        <InfoField label="Company" value={currentEmployee.company} icon={Users} />
-        <InfoField label="Office Location" value={currentEmployee.office} icon={MapPin} />
-        <InfoField label="Start Date" value={new Date(currentEmployee.startDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} icon={Calendar} />
-        <InfoField label="Reports To" value={currentEmployee.manager} icon={User} />
-        <InfoField label="Work Email" value={currentEmployee.email} icon={Mail} />
+        <InfoField label="Employee ID" value={employee.employee_code} icon={User} />
+        <InfoField label="Job Title" value={employee.designation || 'Not assigned'} icon={Briefcase} />
+        <InfoField label="Department" value={employee.department || 'Not assigned'} icon={Building} />
+        <InfoField label="Employment Type" value={employee.employment_type || 'Not specified'} icon={Users} />
+        <InfoField label="Work Email" value={employee.email} icon={Mail} />
+        <InfoField label="Phone Number" value={employee.phone_number || 'Not provided'} icon={Phone} />
+        <InfoField label="Start Date" value={employee.date_of_joining ? new Date(employee.date_of_joining).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : 'Not specified'} icon={Calendar} />
+        <InfoField label="Address" value={employee.address || 'Not provided'} icon={MapPin} />
       </div>
 
       {/* Last Updated */}
       <div className="pt-4 flex items-center gap-2 text-xs text-muted-foreground border-t border-slate-200 dark:border-white/5">
         <Clock className="h-3 w-3" />
-        <span>Last updated: January 2, 2025</span>
+        <span>Last updated: {employee.updated_at ? new Date(employee.updated_at).toLocaleDateString("en-US") : 'N/A'}</span>
       </div>
     </div>
   );
 }
 
 function SkillsTab() {
-  const skillLevels = ["Advanced", "Intermediate", "Advanced", "Intermediate", "Advanced"];
-
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-sm font-semibold text-foreground mb-4">Technical Skills</h3>
-        <div className="space-y-2">
-          {currentEmployee.skills.map((skill, index) => (
-            <div key={skill} className="flex items-center justify-between p-3 rounded-lg bg-slate-100/80 dark:bg-slate-800/30 border border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-              <span className="text-sm font-medium text-foreground">{skill}</span>
-              <span className={cn(
-                "px-2 py-1 rounded text-xs font-medium",
-                skillLevels[index] === "Advanced"
-                  ? "bg-emerald-500/20 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 dark:border-emerald-500/20"
-                  : "bg-blue-500/20 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30 dark:border-blue-500/20"
-              )}>
-                {skillLevels[index]}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="pt-6 border-t border-slate-200 dark:border-white/5">
-        <h3 className="text-sm font-semibold text-foreground mb-4">Certifications</h3>
-        <div className="space-y-3">
-          {currentEmployee.certifications.map((cert, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-4 rounded-xl bg-slate-100/80 dark:bg-slate-800/30 border border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-lg bg-blue-500/20 dark:bg-blue-500/10 border border-blue-500/30 dark:border-blue-500/20 flex items-center justify-center">
-                  <Award className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-foreground">{cert.name}</p>
-                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/20 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 dark:border-emerald-500/20 flex items-center gap-1">
-                      <CheckCircle2 className="h-3 w-3" />
-                      Verified
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">Issued by {cert.issuer}</p>
-                </div>
-              </div>
-              <span className="text-xs text-muted-foreground">{cert.date}</span>
-            </div>
-          ))}
-        </div>
+      <div className="text-center py-12">
+        <Award className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <p className="text-muted-foreground">Skills and certifications will be available soon.</p>
+        <p className="text-sm text-muted-foreground mt-2">Contact HR to add your skills and certifications.</p>
       </div>
     </div>
   );
 }
 
 function DocumentsTab() {
-  const documentStatuses = ["Verified", "Verified", "Pending", "Verified"];
-  const documentSizes = ["2.4 MB", "1.8 MB", "3.1 MB", "890 KB"];
-
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground mb-4">Your employment documents are listed below.</p>
-      {currentEmployee.documents.map((doc, index) => (
-        <div
-          key={index}
-          className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-800/20 hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
-        >
-          <div className="flex items-center gap-4 flex-1">
-            <div className="h-12 w-12 rounded-lg bg-red-500/20 dark:bg-red-500/10 border border-red-500/30 dark:border-red-500/20 flex items-center justify-center">
-              <FileText className="h-6 w-6 text-red-600 dark:text-red-400" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <p className="text-sm font-medium text-foreground">{doc.name}</p>
-                <span className={cn(
-                  "px-2 py-0.5 rounded text-xs font-medium flex items-center gap-1",
-                  documentStatuses[index] === "Verified"
-                    ? "bg-emerald-500/20 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 dark:border-emerald-500/20"
-                    : "bg-amber-500/20 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 dark:border-amber-500/20"
-                )}>
-                  {documentStatuses[index] === "Verified" ? (
-                    <CheckCircle2 className="h-3 w-3" />
-                  ) : (
-                    <Clock className="h-3 w-3" />
-                  )}
-                  {documentStatuses[index]}
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground">{doc.type} • {documentSizes[index]} • Added {doc.date}</p>
-            </div>
-          </div>
-          <Button variant="ghost" size="sm" className="gap-2 hover:bg-slate-200 dark:hover:bg-slate-700/50">
-            <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">Download</span>
-          </Button>
-        </div>
-      ))}
+      <div className="text-center py-12">
+        <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <p className="text-muted-foreground">No documents uploaded yet.</p>
+        <p className="text-sm text-muted-foreground mt-2">Employment documents will be managed by HR.</p>
+      </div>
     </div>
   );
 }
 
 function PayrollTab() {
-  const [showSensitive, setShowSensitive] = useState(false);
-
   return (
     <div className="space-y-6">
       {/* Sensitive Warning */}
@@ -441,26 +362,10 @@ function PayrollTab() {
         </div>
       </div>
 
-      {/* Blur Toggle */}
-      <div className="flex items-center justify-between p-3 rounded-lg bg-slate-100/80 dark:bg-slate-800/30 border border-slate-200 dark:border-white/5">
-        <span className="text-sm text-muted-foreground">Show sensitive data</span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowSensitive(!showSensitive)}
-          className="gap-2"
-        >
-          {showSensitive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          {showSensitive ? "Hide" : "Show"}
-        </Button>
-      </div>
-
-      <div className={cn("grid gap-4 sm:grid-cols-2 transition-all duration-300", !showSensitive && "blur-sm pointer-events-none select-none")}>
-        <InfoField label="Annual Salary" value={currentEmployee.payroll.salary} icon={DollarSign} isPrivate />
-        <InfoField label="Pay Frequency" value={currentEmployee.payroll.payFrequency} icon={Calendar} />
-        <InfoField label="Bank Name" value={currentEmployee.payroll.bankName} icon={Building} isPrivate />
-        <InfoField label="Account (Last 4)" value={`****${currentEmployee.payroll.accountLast4}`} icon={FileText} isPrivate />
-        <InfoField label="Tax ID" value={currentEmployee.payroll.taxId} icon={FileText} isPrivate />
+      <div className="text-center py-12">
+        <DollarSign className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <p className="text-muted-foreground">Payroll information not yet configured.</p>
+        <p className="text-sm text-muted-foreground mt-2">Contact HR department for salary structure setup.</p>
       </div>
     </div>
   );

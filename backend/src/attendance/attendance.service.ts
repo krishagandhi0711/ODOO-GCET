@@ -40,18 +40,23 @@ export class AttendanceService {
     today.setHours(0, 0, 0, 0);
 
     // Step 2: CONSTRAINT 1 - Already Checked In Today?
-    const existingCheckIn = await this.prisma.attendance_records.findFirst({
+    const existingRecord = await this.prisma.attendance_records.findFirst({
       where: {
         employee_id: employee.id,
-        attendance_date: today,
-        check_out: null // Still checked in
+        attendance_date: today
       }
     });
 
-    if (existingCheckIn) {
-      throw new ConflictException(
-        'You have already checked in today. Please check out first.'
-      );
+    if (existingRecord) {
+      if (existingRecord.check_out === null) {
+        throw new ConflictException(
+          'You have already checked in today. Please check out first.'
+        );
+      } else {
+        throw new ConflictException(
+          'You have already completed attendance for today (checked in and out).'
+        );
+      }
     }
 
     // Step 3: CONSTRAINT 2 - Is Employee on Approved Leave? (The Airplane Block)

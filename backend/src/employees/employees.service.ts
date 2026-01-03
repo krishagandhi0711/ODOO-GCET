@@ -36,9 +36,21 @@ export class EmployeesService {
    * If either fails, both are rolled back
    */
   async create(createEmployeeDto: CreateEmployeeDto) {
-    // Default password for new employees (they must change on first login)
-    const defaultPassword = 'Welcome@123';
-    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+    // Use provided password or default
+    const password = createEmployeeDto.password || 'Welcome@123';
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Build full name from first_name and last_name, or use legacy full_name
+    const fullName = createEmployeeDto.first_name && createEmployeeDto.last_name
+      ? `${createEmployeeDto.first_name} ${createEmployeeDto.last_name}`
+      : createEmployeeDto.full_name;
+
+    if (!fullName) {
+      throw new BadRequestException('Either first_name/last_name or full_name is required');
+    }
+
+    // Use phone_number or mobile
+    const phoneNumber = createEmployeeDto.phone_number || createEmployeeDto.mobile;
 
     try {
       return await this.prisma.$transaction(async (tx) => {
@@ -78,16 +90,44 @@ export class EmployeesService {
           data: {
             user_id: newUser.id,
             company_id: createEmployeeDto.company_id || null,
-            full_name: createEmployeeDto.full_name,
-            mobile: createEmployeeDto.mobile,
-            department: createEmployeeDto.department,
-            job_position: createEmployeeDto.job_position,
+            
+            // Handle both new and legacy name fields
+            first_name: createEmployeeDto.first_name || null,
+            last_name: createEmployeeDto.last_name || null,
+            full_name: fullName,
+            
+            // Handle both phone field variants
+            phone_number: createEmployeeDto.phone_number || null,
+            mobile: phoneNumber || null,
+            
+            // Copy email from user
+            email: createEmployeeDto.email,
+            
+            // Handle date of birth (multiple field names)
+            date_of_birth: createEmployeeDto.date_of_birth 
+              ? new Date(createEmployeeDto.date_of_birth) 
+              : null,
+            dob: createEmployeeDto.date_of_birth 
+              ? new Date(createEmployeeDto.date_of_birth) 
+              : (createEmployeeDto.dob ? new Date(createEmployeeDto.dob) : null),
+            
+            // Basic employee details
+            gender: createEmployeeDto.gender || null,
+            department: createEmployeeDto.department || null,
+            
+            // Handle both designation variants
+            designation: createEmployeeDto.designation || null,
+            job_position: createEmployeeDto.designation || createEmployeeDto.job_position || null,
+            
             employee_code: employeeCode, // Auto-generated code
-            date_of_joining: new Date(),
+            employment_type: createEmployeeDto.employment_type || null,
+            
+            date_of_joining: createEmployeeDto.date_of_joining 
+              ? new Date(createEmployeeDto.date_of_joining) 
+              : new Date(),
             
             // Optional fields
             location: createEmployeeDto.location || null,
-            dob: createEmployeeDto.dob ? new Date(createEmployeeDto.dob) : null,
             address: createEmployeeDto.address || null,
             nationality: createEmployeeDto.nationality || null,
             marital_status: createEmployeeDto.marital_status || null,
@@ -124,7 +164,7 @@ export class EmployeesService {
 
         return {
           ...newEmployee,
-          defaultPassword, // Return default password to admin (to be shared with employee)
+          defaultPassword: password, // Return password to admin (to be shared with employee)
         };
       });
     } catch (error) {
@@ -323,13 +363,26 @@ export class EmployeesService {
       }
 
       // Update employee data
-      const { email, role, ...employeeData } = updateEmployeeDto;
+      const { email, role, password, ...employeeData } = updateEmployeeDto;
+
+      // Build full_name if first_name or last_name provided
+      const fullName = updateEmployeeDto.first_name && updateEmployeeDto.last_name
+        ? `${updateEmployeeDto.first_name} ${updateEmployeeDto.last_name}`
+        : undefined;
 
       return await this.prisma.employees.update({
         where: { id },
         data: {
           ...employeeData,
-          dob: updateEmployeeDto.dob ? new Date(updateEmployeeDto.dob) : undefined,
+          full_name: fullName || employeeData.full_name,
+          mobile: updateEmployeeDto.phone_number || employeeData.mobile,
+          job_position: updateEmployeeDto.designation || employeeData.job_position,
+          dob: updateEmployeeDto.date_of_birth 
+            ? new Date(updateEmployeeDto.date_of_birth) 
+            : (updateEmployeeDto.dob ? new Date(updateEmployeeDto.dob) : undefined),
+          date_of_birth: updateEmployeeDto.date_of_birth 
+            ? new Date(updateEmployeeDto.date_of_birth) 
+            : undefined,
         },
         include: {
           users: {
