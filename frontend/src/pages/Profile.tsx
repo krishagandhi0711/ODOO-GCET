@@ -16,28 +16,30 @@ import {
   Lock,
   Eye,
   EyeOff,
-  Edit2,
-  Shield,
-  CheckCircle2,
   Briefcase,
   Award,
   Download,
+  Upload,
+  Plus,
   AlertCircle,
   Clock,
   ExternalLink,
   ShieldCheck,
-  AlertCircle,
-  Clock,
-  Loader2
+  CheckCircle2,
+  FileCode,
+  Loader2,
+  Users
 } from "lucide-react";
+import { currentEmployee } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const tabs = [
-  { id: "resume", label: "Career & Resume" },
-  { id: "private", label: "Private Info" },
-  { id: "salary", label: "Compensation" },
-  { id: "security", label: "Security" },
+  { id: "personal", label: "Identity" },
+  { id: "professional", label: "Career" },
+  { id: "skills", label: "Expertise" },
+  { id: "documents", label: "Vault" },
+  { id: "payroll", label: "Compensation" },
 ];
 
 export default function Profile() {
@@ -93,12 +95,10 @@ export default function Profile() {
 
   return (
     <AppLayout title="My Profile">
-
-
       <div className="w-full mx-auto relative">
         <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
           {/* Left Column - Profile Card */}
-          <div className="lg:sticky lg:top-24 lg:self-start">
+          <div className="lg:sticky lg:top-24 lg:self-start space-y-6">
             <div className="glass rounded-2xl border border-border/50 shadow-[0_8px_32px_rgba(0,0,0,0.12)] overflow-hidden backdrop-blur-xl">
               {/* Header Gradient */}
               <div className="h-24 bg-gradient-to-br from-slate-200/80 via-slate-100/60 to-slate-200/80 dark:from-slate-800/50 dark:via-slate-900/30 dark:to-slate-800/50" />
@@ -176,57 +176,47 @@ export default function Profile() {
                   <span>Verified by HR</span>
                 </div>
               </div>
-              <h1 className="text-5xl lg:text-7xl font-black text-foreground tracking-tighter leading-tight">
-                {currentEmployee.firstName} <span className="text-primary font-black">{currentEmployee.lastName}</span>
-              </h1>
-              <p className="text-xl text-muted-foreground font-bold tracking-tight">
-                {currentEmployee.role} <span className="text-primary mx-2">/</span> <span className="text-foreground">{currentEmployee.company}</span>
-              </p>
             </div>
 
-            {/* Quick Action Matrix - Darker Boxes */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-5xl pt-8">
-              <HeaderMetric label="Employee ID" value={currentEmployee.id} icon={FileText} />
-              <HeaderMetric label="Business Unit" value={currentEmployee.department} icon={Building} />
-              <HeaderMetric label="Regional Hub" value={currentEmployee.office} icon={MapPin} />
+            {/* Quick Metrics */}
+            <div className="grid gap-4">
               <HeaderMetric label="Direct Manager" value={currentEmployee.manager} icon={User} />
+              <HeaderMetric label="Regional Hub" value={currentEmployee.office} icon={MapPin} />
             </div>
           </div>
-        </section>
 
-        {/* SECTION 2: Dynamic Tab Interface */}
-        <section className="space-y-8">
-          {/* Premium Tab Bar - Darker */}
-          <div className="flex flex-wrap items-center justify-center gap-4 p-3 bg-secondary/80 backdrop-blur-3xl rounded-[2.5rem] max-w-fit mx-auto border-2 border-foreground/10 shadow-2xl">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "px-10 py-4 rounded-[2rem] text-xs font-black uppercase tracking-widest transition-all duration-500 relative overflow-hidden",
-                  activeTab === tab.id
-                    ? "bg-primary text-white shadow-2xl shadow-primary/40 scale-105"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                )}
-              >
-                <span className="relative z-10">{tab.label}</span>
-              </button>
-            ))}
-          </div>
+          {/* Right Column - Tabs & Content */}
+          <div className="space-y-6">
+            <div className="glass rounded-2xl border border-border/50 p-2 backdrop-blur-xl">
+              <div className="flex flex-wrap gap-1">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={cn(
+                      "flex-1 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300",
+                      activeTab === tab.id
+                        ? "bg-primary text-white shadow-lg shadow-primary/20"
+                        : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                    )}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          {/* Tab Content */}
-          <div className="p-6 animate-fade-in">
-            {activeTab === "personal" && <PersonalTab employee={employee} />}
-            {activeTab === "professional" && <ProfessionalTab employee={employee} />}
-            {activeTab === "skills" && <SkillsTab />}
-            {activeTab === "documents" && <DocumentsTab />}
-            {activeTab === "payroll" && <PayrollTab />}
+            <div className="glass rounded-3xl border border-border/50 p-8 min-h-[600px] backdrop-blur-xl animate-fade-in">
+              {activeTab === "personal" && <PersonalTab employee={employee} />}
+              {activeTab === "professional" && <ProfessionalTab employee={employee} />}
+              {activeTab === "skills" && <CareerResumeModule />}
+              {activeTab === "documents" && <DocumentsTab />}
+              {activeTab === "payroll" && <PayrollTab employee={employee} />}
+            </div>
           </div>
+        </div>
       </div>
-    </section>
-
-      </div >
-    </AppLayout >
+    </AppLayout>
   );
 }
 
@@ -249,45 +239,78 @@ function calculateProfileCompletion(employee: Employee): number {
   return Math.round((filledFields / fields.length) * 100);
 }
 
+function InfoField({ label, value, icon: Icon, isPrivate, className }: { label: string, value: string, icon: any, isPrivate?: boolean, className?: string }) {
+  return (
+    <div className={cn("group/field relative p-4 rounded-xl bg-slate-100/80 dark:bg-slate-800/30 border border-slate-200 dark:border-white/5 transition-all", className)}>
+      <div className="flex items-center gap-3 mb-1">
+        <Icon className="h-3.5 w-3.5 text-primary opacity-70" />
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</span>
+        {isPrivate && <Lock className="h-2.5 w-2.5 text-primary/60 ml-auto" />}
+      </div>
+      <p className="text-sm font-semibold text-foreground truncate">{value}</p>
+    </div>
+  );
+}
+
 function PersonalTab({ employee }: { employee: Employee }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
-      <div className="flex items-center gap-5">
-        <div className="h-16 w-16 rounded-[1.5rem] bg-primary text-white flex items-center justify-center shadow-2xl shadow-primary/20">
-          <Icon className="h-8 w-8" />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <InfoField label="Full Name" value={`${employee.first_name} ${employee.last_name}`} icon={User} />
-          <InfoField label="Email" value={employee.email} icon={Mail} />
-          <InfoField label="Phone" value={employee.phone_number || 'Not provided'} icon={Phone} />
-        </div>
+    <div className="space-y-8">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <InfoField label="Full Name" value={`${employee.first_name} ${employee.last_name}`} icon={User} />
+        <InfoField label="Email" value={employee.email} icon={Mail} />
+        <InfoField label="Phone" value={employee.phone_number || 'Not provided'} icon={Phone} />
+        <InfoField
+          label="Date of Birth"
+          value={employee.date_of_birth ? new Date(employee.date_of_birth).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : 'Not provided'}
+          icon={Calendar}
+          isPrivate
+        />
+        <InfoField label="Gender" value={employee.gender || 'Not provided'} icon={User} isPrivate />
+        <InfoField label="Address" value={employee.address || 'Not provided'} icon={MapPin} className="sm:col-span-2" isPrivate />
       </div>
-      {action}
+    </div>
+  )
+}
+
+function HeaderMetric({ label, value, icon: Icon }: { label: string, value: string, icon: any }) {
+  return (
+    <div className="p-4 rounded-xl bg-slate-100/80 dark:bg-slate-800/30 border border-slate-200 dark:border-white/5 text-left transition-all hover:border-primary/30">
+      <div className="flex items-center gap-2 mb-1">
+        <Icon className="h-3.5 w-3.5 text-primary" />
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</span>
+      </div>
+      <p className="text-sm font-bold text-foreground truncate">{value}</p>
     </div>
   )
 }
 
 function DarkCardField({ label, value, icon: Icon, isPrivate }: { label: string, value: string, icon: any, isPrivate?: boolean }) {
   return (
-    <div className="group/field relative p-8 rounded-[2rem] bg-secondary/80 border-2 border-foreground/10 hover:border-primary/30 transition-all shadow-xl overflow-hidden">
-      {isPrivate && (
-        <div className="absolute top-4 right-6 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/20 border border-primary/20 h-fit">
-          <Lock className="h-2.5 w-2.5 text-primary" />
-          <span className="text-[8px] font-black text-primary uppercase">Secure</span>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <InfoField 
-            label="Date of Birth" 
-            value={employee.date_of_birth ? new Date(employee.date_of_birth).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : 'Not provided'} 
-            icon={Calendar} 
-            isPrivate 
-          />
-          <InfoField label="Gender" value={employee.gender || 'Not provided'} icon={User} isPrivate />
-          <InfoField label="Address" value={employee.address || 'Not provided'} icon={MapPin} className="sm:col-span-2" isPrivate />
-        </div>
-        <p className="text-lg font-black text-foreground tracking-tight leading-tight">{value}</p>
+    <div className="group/field relative p-6 rounded-2xl bg-slate-100/50 dark:bg-slate-800/20 border border-slate-200 dark:border-white/5 transition-all">
+      <div className="flex items-center gap-3 mb-1.5">
+        <Icon className="h-3.5 w-3.5 text-primary opacity-70" />
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</span>
+        {isPrivate && <Lock className="h-2.5 w-2.5 text-primary/60 ml-auto" />}
       </div>
-    </div >
+      <p className="text-sm font-semibold text-foreground truncate">{value}</p>
+    </div>
+  )
+}
+
+function SectionHeading({ title, subtitle, icon: Icon, action }: { title: string, subtitle: string, icon: any, action?: React.ReactNode }) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+      <div className="flex items-center gap-4">
+        <div className="h-14 w-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+          <Icon className="h-7 w-7" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-black text-foreground tracking-tighter uppercase leading-none">{title}</h2>
+          <p className="text-[10px] font-bold text-primary uppercase tracking-[0.3em] mt-1 opacity-80">{subtitle}</p>
+        </div>
+      </div>
+      {action}
+    </div>
   )
 }
 
@@ -423,24 +446,32 @@ function DocumentsTab() {
   );
 }
 
-function PayrollTab() {
+function PayrollTab({ employee }: { employee: Employee }) {
   return (
-    <div className="space-y-6">
-      {/* Sensitive Warning */}
-      <div className="p-4 rounded-xl bg-amber-500/20 dark:bg-amber-500/10 border border-amber-500/30 dark:border-amber-500/20 flex items-start gap-3">
-        <Lock className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-        <div className="flex-1">
-          <p className="text-sm font-medium text-amber-600 dark:text-amber-400 mb-1">Sensitive Information</p>
-          <p className="text-xs text-amber-600/80 dark:text-amber-400/80">
-            Payroll information is read-only and controlled by HR. Contact HR for any changes.
+    <div className="space-y-8 animate-fade-in">
+      <SectionHeading title="Compensation" subtitle="Financial Reward Structure" icon={DollarSign} />
+
+      <div className="p-6 rounded-2xl bg-primary/5 border border-primary/20 flex items-start gap-4">
+        <Lock className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+        <div>
+          <h4 className="text-sm font-bold text-foreground uppercase tracking-tight mb-1">Encrypted Intelligence</h4>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Payroll metrics are obfuscated for security. Detailed compensation summaries are active in the Institutional Hub.
           </p>
         </div>
       </div>
 
-      <div className="text-center py-12">
-        <DollarSign className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground">Payroll information not yet configured.</p>
-        <p className="text-sm text-muted-foreground mt-2">Contact HR department for salary structure setup.</p>
+      <div className="grid sm:grid-cols-2 gap-6">
+        <InfoField label="Institutional Base" value={currentEmployee.payroll.salary} icon={DollarSign} isPrivate />
+        <InfoField label="Cycle Frequency" value={currentEmployee.payroll.payFrequency} icon={Calendar} />
+        <InfoField label="Deposit Institution" value={currentEmployee.payroll.bankName} icon={Building} />
+        <InfoField label="Identification Key" value={currentEmployee.payroll.taxId} icon={FileText} isPrivate />
+      </div>
+
+      <div className="p-10 rounded-3xl bg-foreground text-background text-center space-y-2">
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-60">Total Value Manifest</p>
+        <p className="text-5xl font-black tracking-tighter">$145,000.00</p>
+        <p className="text-xs font-bold opacity-60 uppercase tracking-widest">Calculated Annual Gross</p>
       </div>
     </div>
   );

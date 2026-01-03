@@ -252,8 +252,10 @@ export default function Attendance() {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Table */}
+          {/* Table Module */}
+          <div className="lg:col-span-7 bg-secondary rounded-[2.5rem] border border-foreground/10 p-4 shadow-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -322,6 +324,7 @@ export default function Attendance() {
             </div>
           </div>
         </div>
+      </div>
     </AppLayout>
   );
 }
@@ -370,4 +373,22 @@ function Th({ label, className }: { label: string, className?: string }) {
       {label}
     </th>
   )
+}
+
+function StatCard({ label, value, color }: { label: string, value: string, color: string }) {
+  const colorMap: Record<string, string> = {
+    primary: "text-primary bg-primary/10 border-primary/20",
+    emerald: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+    red: "text-red-500 bg-red-500/10 border-red-500/20",
+    amber: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+  };
+
+  const colorStyle = colorMap[color] || colorMap.primary;
+
+  return (
+    <div className={cn("p-4 rounded-2xl border flex flex-col items-center justify-center text-center space-y-1 transition-all", colorStyle)}>
+      <span className="text-[10px] font-black uppercase tracking-widest opacity-80">{label}</span>
+      <p className="text-xl font-black tracking-tighter">{value}</p>
+    </div>
+  );
 }
