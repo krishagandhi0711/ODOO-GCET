@@ -1,25 +1,81 @@
 import { IsString, IsEmail, IsNotEmpty, IsOptional, IsDateString, IsInt, IsEnum } from 'class-validator';
 
 export class CreateEmployeeDto {
-  @IsString()
-  @IsNotEmpty()
-  full_name: string;
-
+  // User credentials
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
+  @IsOptional()
+  @IsString()
+  password?: string;
+
+  @IsOptional()
+  @IsEnum(['ADMIN', 'HR', 'EMPLOYEE'])
+  role?: 'ADMIN' | 'HR' | 'EMPLOYEE';
+
+  // Basic employee info
   @IsString()
   @IsNotEmpty()
-  mobile: string;
+  first_name: string;
 
   @IsString()
   @IsNotEmpty()
-  department: string;
+  last_name: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  job_position: string;
+  phone_number?: string;
+
+  @IsOptional()
+  @IsDateString()
+  date_of_birth?: string;
+
+  @IsOptional()
+  @IsString()
+  gender?: string;
+
+  @IsOptional()
+  @IsString()
+  address?: string;
+
+  // Employment details
+  @IsOptional()
+  @IsString()
+  department?: string;
+
+  @IsOptional()
+  @IsString()
+  designation?: string;
+
+  @IsOptional()
+  @IsDateString()
+  date_of_joining?: string;
+
+  @IsOptional()
+  @IsString()
+  employment_type?: string;
+
+  @IsOptional()
+  @IsInt()
+  company_id?: number;
+
+  @IsOptional()
+  @IsInt()
+  manager_id?: number;
+
+  // Legacy fields for backward compatibility
+  @IsOptional()
+  @IsString()
+  full_name?: string;
+
+  @IsOptional()
+  @IsString()
+  mobile?: string;
+
+  @IsOptional()
+  @IsString()
+  job_position?: string;
 
   @IsOptional()
   @IsString()
@@ -31,29 +87,12 @@ export class CreateEmployeeDto {
 
   @IsOptional()
   @IsString()
-  address?: string;
-
-  @IsOptional()
-  @IsString()
   nationality?: string;
 
   @IsOptional()
   @IsString()
   marital_status?: string;
 
-  @IsOptional()
-  @IsInt()
-  manager_id?: number;
-
-  @IsOptional()
-  @IsInt()
-  company_id?: number;
-
-  @IsOptional()
-  @IsEnum(['ADMIN', 'HR', 'EMPLOYEE'])
-  role?: 'ADMIN' | 'HR' | 'EMPLOYEE';
-
-  // Private fields (Optional - Admin can set during creation)
   @IsOptional()
   @IsString()
   pan_no?: string;

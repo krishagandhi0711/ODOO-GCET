@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { currentEmployee } from "@/data/mockData";
+import { employeeService } from "@/services/employee.service";
+import { toastService } from "@/services/toast.service";
+import type { Employee } from "@/types/api.types";
 import { cn } from "@/lib/utils";
 import {
   User,
@@ -24,10 +26,9 @@ import {
   Clock,
   ExternalLink,
   ShieldCheck,
-  Fingerprint,
-  FileCode,
-  Upload,
-  Plus
+  AlertCircle,
+  Clock,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,38 +41,140 @@ const tabs = [
 ];
 
 export default function Profile() {
-  const [activeTab, setActiveTab] = useState("resume");
-  const [showSalary, setShowSalary] = useState(false);
+  const [activeTab, setActiveTab] = useState("personal");
+  const [employee, setEmployee] = useState<Employee | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchEmployeeData();
+  }, []);
+
+  const fetchEmployeeData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await employeeService.getMyProfile();
+      setEmployee(data);
+    } catch (error: any) {
+      toastService.error(error.message || 'Failed to load profile');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <AppLayout title="My Profile">
+        <div className="flex items-center justify-center h-96">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (!employee) {
+    return (
+      <AppLayout title="My Profile">
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">Failed to load profile</p>
+            <Button onClick={fetchEmployeeData} className="mt-4">
+              Retry
+            </Button>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  const fullName = `${employee.first_name || ''} ${employee.last_name || ''}`.trim();
+  const initials = `${employee.first_name?.[0] || 'U'}${employee.last_name?.[0] || 'N'}`;
+
 
   return (
-    <AppLayout title="Employee Profile">
-      <div className="max-w-[1400px] mx-auto space-y-12 pb-20 px-4">
+    <AppLayout title="My Profile">
 
-        {/* SECTION 1: Ethereal Profile Hero */}
-        <section className="relative pt-20 pb-12 px-8 rounded-[3rem] border-2 border-primary/20 overflow-hidden group bg-secondary/30">
-          {/* Kinetic background elements */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.05] via-transparent to-primary/[0.08] pointer-events-none" />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,hsl(var(--primary)/0.15)_0%,transparent_70%)] pointer-events-none" />
 
-          <div className="relative z-10 flex flex-col items-center text-center space-y-8">
-            {/* Main Avatar Hub */}
-            <div className="relative">
-              <div className="h-40 w-40 rounded-[3.5rem] bg-gradient-to-tr from-foreground to-foreground/80 p-[3px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] transition-transform duration-700 group-hover:scale-105">
-                <div className="h-full w-full rounded-[3.4rem] bg-background flex items-center justify-center text-foreground text-5xl font-black tracking-tighter overflow-hidden relative">
-                  <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-                  {currentEmployee.firstName[0]}{currentEmployee.lastName[0]}
+      <div className="w-full mx-auto relative">
+        <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+          {/* Left Column - Profile Card */}
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <div className="glass rounded-2xl border border-border/50 shadow-[0_8px_32px_rgba(0,0,0,0.12)] overflow-hidden backdrop-blur-xl">
+              {/* Header Gradient */}
+              <div className="h-24 bg-gradient-to-br from-slate-200/80 via-slate-100/60 to-slate-200/80 dark:from-slate-800/50 dark:via-slate-900/30 dark:to-slate-800/50" />
+
+              {/* Profile Info */}
+              <div className="px-6 pb-6 -mt-12">
+                <div className="relative inline-block">
+                  <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center text-slate-800 dark:text-white text-3xl font-bold shadow-lg border-4 border-background mx-auto">
+                    {initials}
+                  </div>
+                  {/* Verified Badge */}
+                  <div className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-emerald-500/30 dark:bg-emerald-500/20 border-2 border-emerald-500/40 dark:border-emerald-500/30 flex items-center justify-center backdrop-blur-sm">
+                    <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  </div>
                 </div>
-              </div>
 
-              <div className="absolute -right-2 bottom-4 h-12 w-12 rounded-2xl bg-primary border-2 border-background flex items-center justify-center shadow-2xl animate-bounce-slow text-white">
-                <ShieldCheck className="h-6 w-6" />
-              </div>
-            </div>
+                <div className="text-center mt-4">
+                  <h2 className="text-xl font-semibold text-foreground">{fullName}</h2>
+                  <p className="text-muted-foreground mt-1">{employee.designation || 'Employee'}</p>
 
-            <div className="space-y-4 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-primary text-white text-[10px] font-black tracking-[0.2em] uppercase shadow-lg shadow-primary/30">
-                <Fingerprint className="h-4 w-4" />
-                Verified Corporate Talent
+                  {/* Status Chip */}
+                  <div className="flex items-center justify-center gap-2 mt-3">
+                    <span className="px-3 py-1 rounded-full bg-emerald-500/20 dark:bg-emerald-500/10 border border-emerald-500/30 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-medium flex items-center gap-1.5">
+                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse" />
+                      Active
+                    </span>
+                    <span className="px-3 py-1 rounded-full bg-blue-500/20 dark:bg-blue-500/10 border border-blue-500/30 dark:border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-medium">
+                      {employee.employment_type || 'Full Time'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Profile Completion */}
+                <div className="mt-6 p-4 rounded-xl bg-slate-100/80 dark:bg-slate-800/30 border border-slate-200 dark:border-white/5">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-muted-foreground">Profile Completion</span>
+                    <span className="text-xs font-semibold text-foreground">
+                      {calculateProfileCompletion(employee)}%
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-slate-200 dark:bg-slate-800/50 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full" style={{ width: `${calculateProfileCompletion(employee)}%` }} />
+                  </div>
+                </div>
+
+                <div className="mt-6 space-y-3">
+                  {employee.department && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <Building className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-foreground">{employee.department}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-3 text-sm">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-foreground">Company</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-foreground">
+                      Joined {employee.date_of_joining ? new Date(employee.date_of_joining).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-slate-200 dark:border-white/5">
+                  <div className="text-xs text-muted-foreground mb-2">Employee ID</div>
+                  <div className="text-sm font-mono text-foreground bg-slate-100/80 dark:bg-slate-800/30 rounded-lg px-3 py-2 border border-slate-200 dark:border-white/5">
+                    {employee.employee_code}
+                  </div>
+                </div>
+
+                {/* Verified by HR Badge */}
+                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-emerald-600 dark:text-emerald-400/80">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>Verified by HR</span>
+                </div>
               </div>
               <h1 className="text-5xl lg:text-7xl font-black text-foreground tracking-tighter leading-tight">
                 {currentEmployee.firstName} <span className="text-primary font-black">{currentEmployee.lastName}</span>
@@ -111,44 +214,52 @@ export default function Profile() {
             ))}
           </div>
 
-          {/* Master Content Container */}
-          <div className="min-h-[600px] animate-in fade-in slide-in-from-bottom-8 duration-700">
-            {activeTab === "resume" && <CareerResumeModule />}
-            {activeTab === "private" && <PersonalInformationModule />}
-            {activeTab === "salary" && <CompensationIntelligenceModule showSalary={showSalary} setShowSalary={setShowSalary} />}
-            {activeTab === "security" && <SecurityProtocolModule />}
+          {/* Tab Content */}
+          <div className="p-6 animate-fade-in">
+            {activeTab === "personal" && <PersonalTab employee={employee} />}
+            {activeTab === "professional" && <ProfessionalTab employee={employee} />}
+            {activeTab === "skills" && <SkillsTab />}
+            {activeTab === "documents" && <DocumentsTab />}
+            {activeTab === "payroll" && <PayrollTab />}
           </div>
-        </section>
-
       </div>
-    </AppLayout>
+    </section>
+
+      </div >
+    </AppLayout >
   );
 }
 
-{/* SUB-COMPONENTS - HIGH CONTRAST DARK MODE */ }
+// Helper function to calculate profile completion
+function calculateProfileCompletion(employee: Employee): number {
+  const fields = [
+    employee.first_name,
+    employee.last_name,
+    employee.email,
+    employee.phone_number,
+    employee.date_of_birth,
+    employee.gender,
+    employee.address,
+    employee.department,
+    employee.designation,
+    employee.employment_type,
+  ];
 
-function HeaderMetric({ label, value, icon: Icon }: { label: string, value: string, icon: any }) {
-  return (
-    <div className="p-6 rounded-[2rem] bg-secondary/80 border-2 border-foreground/10 hover:border-primary/50 transition-all group/metric text-left shadow-xl">
-      <div className="flex items-center gap-3 mb-2">
-        <Icon className="h-4 w-4 text-primary group-hover/metric:scale-110 transition-transform" />
-        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{label}</span>
-      </div>
-      <p className="text-base font-black text-foreground truncate">{value}</p>
-    </div>
-  )
+  const filledFields = fields.filter(field => field && field.trim().length > 0).length;
+  return Math.round((filledFields / fields.length) * 100);
 }
 
-function SectionHeading({ title, subtitle, icon: Icon, action }: { title: string, subtitle: string, icon: any, action?: React.ReactNode }) {
+function PersonalTab({ employee }: { employee: Employee }) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
       <div className="flex items-center gap-5">
         <div className="h-16 w-16 rounded-[1.5rem] bg-primary text-white flex items-center justify-center shadow-2xl shadow-primary/20">
           <Icon className="h-8 w-8" />
         </div>
-        <div>
-          <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase leading-none">{title}</h2>
-          <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mt-1">{subtitle}</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <InfoField label="Full Name" value={`${employee.first_name} ${employee.last_name}`} icon={User} />
+          <InfoField label="Email" value={employee.email} icon={Mail} />
+          <InfoField label="Phone" value={employee.phone_number || 'Not provided'} icon={Phone} />
         </div>
       </div>
       {action}
@@ -164,15 +275,19 @@ function DarkCardField({ label, value, icon: Icon, isPrivate }: { label: string,
           <Lock className="h-2.5 w-2.5 text-primary" />
           <span className="text-[8px] font-black text-primary uppercase">Secure</span>
         </div>
-      )}
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-center gap-3 mb-2">
-          <Icon className="h-4 w-4 text-primary opacity-80 group-hover/field:opacity-100 group-hover/field:scale-110 transition-all" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{label}</span>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <InfoField 
+            label="Date of Birth" 
+            value={employee.date_of_birth ? new Date(employee.date_of_birth).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : 'Not provided'} 
+            icon={Calendar} 
+            isPrivate 
+          />
+          <InfoField label="Gender" value={employee.gender || 'Not provided'} icon={User} isPrivate />
+          <InfoField label="Address" value={employee.address || 'Not provided'} icon={MapPin} className="sm:col-span-2" isPrivate />
         </div>
         <p className="text-lg font-black text-foreground tracking-tight leading-tight">{value}</p>
       </div>
-    </div>
+    </div >
   )
 }
 
@@ -261,163 +376,71 @@ function CareerResumeModule() {
   );
 }
 
-function PersonalInformationModule() {
+function ProfessionalTab({ employee }: { employee: Employee }) {
   return (
-    <div className="grid lg:grid-cols-2 gap-12">
-      <div className="space-y-12">
-        <SectionHeading title="Identity Vault" subtitle="Private Personal Metics" icon={Lock} />
-        <div className="grid sm:grid-cols-2 gap-6">
-          <DarkCardField label="Legal DOB" value={new Date(currentEmployee.dateOfBirth).toLocaleDateString()} icon={Calendar} isPrivate />
-          <DarkCardField label="Gender Identity" value={currentEmployee.gender} icon={User} />
-          <div className="sm:col-span-2">
-            <DarkCardField label="Registered Address" value={currentEmployee.address} icon={MapPin} isPrivate />
-          </div>
-        </div>
-
-        <div className="p-10 rounded-[3rem] bg-secondary border-2 border-primary/20 space-y-8 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 h-40 w-40 bg-primary/5 rounded-full blur-3xl" />
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="h-12 w-12 rounded-xl bg-primary text-white flex items-center justify-center">
-              <AlertCircle className="h-6 w-6" />
-            </div>
-            <h4 className="text-lg font-black text-foreground uppercase tracking-tight">Emergency Dispatch</h4>
-          </div>
-          <div className="grid sm:grid-cols-3 gap-10 relative z-10">
-            <div className="space-y-1">
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Contact Name</span>
-              <p className="text-base font-black text-foreground uppercase tracking-tight">{currentEmployee.emergencyContact.name}</p>
-            </div>
-            <div className="space-y-1">
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Affiliation</span>
-              <p className="text-base font-black text-foreground uppercase tracking-tight">{currentEmployee.emergencyContact.relationship}</p>
-            </div>
-            <div className="space-y-1">
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Direct Line</span>
-              <p className="text-base font-black text-primary underline decoration-2 underline-offset-4">{currentEmployee.emergencyContact.phone}</p>
-            </div>
-          </div>
-        </div>
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <InfoField label="Employee ID" value={employee.employee_code} icon={User} />
+        <InfoField label="Job Title" value={employee.designation || 'Not assigned'} icon={Briefcase} />
+        <InfoField label="Department" value={employee.department || 'Not assigned'} icon={Building} />
+        <InfoField label="Employment Type" value={employee.employment_type || 'Not specified'} icon={Users} />
+        <InfoField label="Work Email" value={employee.email} icon={Mail} />
+        <InfoField label="Phone Number" value={employee.phone_number || 'Not provided'} icon={Phone} />
+        <InfoField label="Start Date" value={employee.date_of_joining ? new Date(employee.date_of_joining).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : 'Not specified'} icon={Calendar} />
+        <InfoField label="Address" value={employee.address || 'Not provided'} icon={MapPin} />
       </div>
 
-      <div className="space-y-12">
-        <SectionHeading title="Documentation" subtitle="Verified Legal Archives" icon={FileText} />
-        <div className="grid gap-6">
-          {currentEmployee.documents.map((doc, i) => (
-            <div key={i} className="flex items-center justify-between p-8 rounded-[2.5rem] bg-secondary/80 border-2 border-foreground/10 hover:border-primary/40 transition-all group shadow-xl">
-              <div className="flex items-center gap-6">
-                <div className="h-16 w-16 rounded-2xl bg-foreground text-background flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all shadow-lg">
-                  <FileText className="h-8 w-8" />
-                </div>
-                <div>
-                  <p className="text-lg font-black text-foreground tracking-tight uppercase">{doc.name}</p>
-                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">{doc.type} • Added {doc.date}</p>
-                </div>
-              </div>
-              <Button variant="ghost" size="icon" className="h-14 w-14 rounded-2xl hover:bg-primary/10 hover:text-primary transition-all border border-foreground/5">
-                <Download className="h-6 w-6" />
-              </Button>
-            </div>
-          ))}
-        </div>
+      {/* Last Updated */}
+      <div className="pt-4 flex items-center gap-2 text-xs text-muted-foreground border-t border-slate-200 dark:border-white/5">
+        <Clock className="h-3 w-3" />
+        <span>Last updated: {employee.updated_at ? new Date(employee.updated_at).toLocaleDateString("en-US") : 'N/A'}</span>
       </div>
     </div>
   );
 }
 
-function CompensationIntelligenceModule({ showSalary, setShowSalary }: { showSalary: boolean, setShowSalary: (s: boolean) => void }) {
+function SkillsTab() {
   return (
-    <div className="max-w-5xl mx-auto space-y-12">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-        <SectionHeading title="Compensation" subtitle="Financial Reward Structure" icon={DollarSign} />
-        <Button
-          onClick={() => setShowSalary(!showSalary)}
-          className={cn(
-            "h-16 px-10 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] transition-all shadow-2xl",
-            showSalary ? "bg-secondary text-foreground border-2 border-foreground/10" : "bg-primary text-white shadow-primary/40 scale-105"
-          )}
-        >
-          {showSalary ? <EyeOff className="h-5 w-5 mr-3" /> : <Eye className="h-5 w-5 mr-3" />}
-          {showSalary ? "Obfuscate Figures" : "Verify Financials"}
-        </Button>
+    <div className="space-y-6">
+      <div className="text-center py-12">
+        <Award className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <p className="text-muted-foreground">Skills and certifications will be available soon.</p>
+        <p className="text-sm text-muted-foreground mt-2">Contact HR to add your skills and certifications.</p>
       </div>
-
-      {!showSalary ? (
-        <div className="h-[28rem] w-full rounded-[4rem] border-2 border-primary/20 bg-secondary/80 backdrop-blur-3xl flex flex-col items-center justify-center text-center p-12 space-y-8 shadow-2xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-50" />
-          <div className="h-24 w-24 rounded-[2.5rem] bg-primary text-white flex items-center justify-center shadow-2xl shadow-primary/30 relative z-10">
-            <Lock className="h-12 w-12" />
-          </div>
-          <div className="space-y-4 relative z-10">
-            <h3 className="text-3xl font-black uppercase tracking-tighter">Encrypted Financial Vault</h3>
-            <p className="text-base text-muted-foreground font-bold max-w-sm uppercase tracking-widest leading-relaxed">Identity verification required to process compensation metrics.</p>
-          </div>
-        </div>
-      ) : (
-        <div className="animate-in zoom-in-95 fade-in duration-700 space-y-12">
-          <div className="grid md:grid-cols-2 gap-8">
-            <DarkCardField label="Gross Annual Salary" value={currentEmployee.payroll.salary} icon={DollarSign} isPrivate />
-            <DarkCardField label="Disbursement Cycle" value={currentEmployee.payroll.payFrequency} icon={Calendar} />
-            <DarkCardField label="Deposit Institution" value={currentEmployee.payroll.bankName} icon={Building} />
-            <DarkCardField label="Corporate Tax ID" value={currentEmployee.payroll.taxId} icon={FileText} isPrivate />
-          </div>
-
-          <div className="p-12 rounded-[4rem] border-2 border-foreground/10 bg-secondary/60 backdrop-blur-xl shadow-2xl text-center">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-primary mb-12">Institutional Benefit Structure</h4>
-            <div className="grid sm:grid-cols-3 gap-16">
-              <div className="space-y-3">
-                <span className="text-5xl font-black tracking-tighter text-foreground">$50,000</span>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Base Allocation</p>
-              </div>
-              <div className="space-y-3">
-                <span className="text-5xl font-black tracking-tighter text-foreground">$20,000</span>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Standard Allowances</p>
-              </div>
-              <div className="space-y-3">
-                <span className="text-5xl font-black tracking-tighter text-primary font-black">$15,000</span>
-                <p className="text-[10px] font-black uppercase tracking-widest text-primary">Performance Variable</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-function SecurityProtocolModule() {
+function DocumentsTab() {
   return (
-    <div className="max-w-4xl mx-auto space-y-12">
-      <SectionHeading title="Access Protocol" subtitle="Security Credential Matrix" icon={Shield} />
+    <div className="space-y-4">
+      <div className="text-center py-12">
+        <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <p className="text-muted-foreground">No documents uploaded yet.</p>
+        <p className="text-sm text-muted-foreground mt-2">Employment documents will be managed by HR.</p>
+      </div>
+    </div>
+  );
+}
 
-      <div className="grid md:grid-cols-2 gap-12">
-        <div className="space-y-8">
-          <div className="grid gap-6">
-            <DarkSecurityInput label="Primary Authentication Key" placeholder="Current sequence..." />
-            <DarkSecurityInput label="Define New Access Key" placeholder="Min 12 alphanumeric..." />
-            <DarkSecurityInput label="Confirm New Access Key" placeholder="Re-enter to validate..." />
-          </div>
-          <Button className="w-full h-16 rounded-[2rem] font-black text-xs uppercase tracking-widest bg-primary text-white shadow-2xl shadow-primary/30 hover:scale-[1.02] transition-all">
-            Rotate Access Tokens
-          </Button>
+function PayrollTab() {
+  return (
+    <div className="space-y-6">
+      {/* Sensitive Warning */}
+      <div className="p-4 rounded-xl bg-amber-500/20 dark:bg-amber-500/10 border border-amber-500/30 dark:border-amber-500/20 flex items-start gap-3">
+        <Lock className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+        <div className="flex-1">
+          <p className="text-sm font-medium text-amber-600 dark:text-amber-400 mb-1">Sensitive Information</p>
+          <p className="text-xs text-amber-600/80 dark:text-amber-400/80">
+            Payroll information is read-only and controlled by HR. Contact HR for any changes.
+          </p>
         </div>
+      </div>
 
-        <div className="p-12 rounded-[4rem] bg-foreground text-background shadow-2xl flex flex-col justify-between relative overflow-hidden group/mfa">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/40 to-transparent opacity-0 group-hover/mfa:opacity-100 transition-opacity" />
-          <div className="space-y-8 relative z-10">
-            <div className="h-20 w-20 rounded-[2rem] bg-background/10 flex items-center justify-center shadow-xl">
-              <Fingerprint className="h-10 w-10 text-background" />
-            </div>
-            <div className="space-y-3">
-              <h4 className="text-2xl font-black tracking-tighter uppercase italic">MFA Hardened Perimeter</h4>
-              <p className="text-sm font-bold opacity-70 leading-relaxed uppercase tracking-widest">
-                Enforce an additional cryptographic layer for all authentication requests.
-              </p>
-            </div>
-          </div>
-          <Button variant="outline" className="w-full h-16 rounded-[2rem] border-background/20 text-background font-black text-xs uppercase tracking-widest mt-12 hover:bg-background/10 transition-all relative z-10">
-            Configure Protocol
-          </Button>
-        </div>
+      <div className="text-center py-12">
+        <DollarSign className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <p className="text-muted-foreground">Payroll information not yet configured.</p>
+        <p className="text-sm text-muted-foreground mt-2">Contact HR department for salary structure setup.</p>
       </div>
     </div>
   );

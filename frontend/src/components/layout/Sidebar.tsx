@@ -171,31 +171,6 @@ export function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {
       >
         {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>
-
-      {/* Role Switcher - Fixed at Bottom */}
-      <div className="mt-auto p-4 border-t border-white/5 bg-black/5 overflow-hidden">
-        <Button
-          variant="outline"
-          size="sm"
-          className={cn(
-            "w-full flex items-center gap-2 justify-center py-5 rounded-xl border-white/10 hover:bg-white/5 hover:text-primary hover:border-primary/20 transition-all duration-300",
-            isCollapsed && "px-0"
-          )}
-          onClick={() => setRole(isAdmin ? 'employee' : 'admin')}
-        >
-          {isAdmin ? (
-            <>
-              <UserCircle size={18} />
-              {!isCollapsed && <span className="font-medium whitespace-nowrap">Switch to Employee</span>}
-            </>
-          ) : (
-            <>
-              <Shield size={18} />
-              {!isCollapsed && <span className="font-medium whitespace-nowrap">Switch to Admin</span>}
-            </>
-          )}
-        </Button>
-      </div>
     </aside>
   );
 }

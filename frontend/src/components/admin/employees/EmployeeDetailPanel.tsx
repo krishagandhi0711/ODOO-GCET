@@ -1,6 +1,6 @@
-import { Employee } from '@/data/mockData';
+import { Employee } from '@/types/api.types';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { X, Mail, Phone, Calendar, Building, Briefcase } from 'lucide-react';
+import { X, Mail, Phone, Calendar, Building, Briefcase, Badge } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface EmployeeDetailPanelProps {
@@ -8,25 +8,20 @@ interface EmployeeDetailPanelProps {
   onClose: () => void;
 }
 
-const statusConfig = {
-  present: { label: 'Present', className: 'bg-success/10 text-success' },
-  'on-leave': { label: 'On Leave', className: 'bg-warning/10 text-warning' },
-  absent: { label: 'Absent', className: 'bg-destructive/10 text-destructive' },
-};
-
 export function EmployeeDetailPanel({ employee, onClose }: EmployeeDetailPanelProps) {
   if (!employee) return null;
 
-  const status = statusConfig[employee.status];
-  const joinDate = new Date(employee.joinDate).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  const getInitials = (firstName: string = '', lastName: string = '') => {
+    return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase() || 'NA';
+  };
 
-  const grossSalary = employee.salary.basic + employee.salary.hra + employee.salary.allowances;
-  const totalDeductions = employee.salary.pfDeduction + employee.salary.taxDeduction;
-  const netSalary = grossSalary - totalDeductions;
+  const joinDate = employee.date_of_joining 
+    ? new Date(employee.date_of_joining).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    : 'Not specified';
 
   return (
     <div className="fixed inset-y-0 right-0 w-full max-w-md bg-card border-l border-border shadow-elevated z-50 animate-slide-in overflow-y-auto">
@@ -45,16 +40,19 @@ export function EmployeeDetailPanel({ employee, onClose }: EmployeeDetailPanelPr
         <div className="text-center">
           <Avatar className="h-20 w-20 mx-auto bg-primary">
             <AvatarFallback className="bg-primary text-primary-foreground text-xl font-semibold">
-              {employee.avatar}
+              {getInitials(employee.first_name, employee.last_name)}
             </AvatarFallback>
           </Avatar>
           <h3 className="mt-4 text-xl font-semibold text-card-foreground">
-            {employee.firstName} {employee.lastName}
+            {employee.first_name} {employee.last_name}
           </h3>
-          <p className="text-sm text-muted-foreground">{employee.role}</p>
-          <span className={cn('inline-block mt-2 rounded-full px-3 py-1 text-xs font-medium', status.className)}>
-            {status.label}
-          </span>
+          <p className="text-sm text-muted-foreground">{employee.designation || 'N/A'}</p>
+          <p className="text-xs text-muted-foreground font-mono mt-1">{employee.employee_code}</p>
+          {employee.employment_type && (
+            <span className="inline-block mt-2 rounded-full px-3 py-1 text-xs font-medium bg-primary/10 text-primary">
+              {employee.employment_type}
+            </span>
+          )}
         </div>
 
         {/* Contact Information */}
@@ -65,10 +63,12 @@ export function EmployeeDetailPanel({ employee, onClose }: EmployeeDetailPanelPr
               <Mail size={16} className="text-muted-foreground" />
               <span className="text-card-foreground">{employee.email}</span>
             </div>
-            <div className="flex items-center gap-3 text-sm">
-              <Phone size={16} className="text-muted-foreground" />
-              <span className="text-card-foreground">{employee.phone}</span>
-            </div>
+            {employee.phone && (
+              <div className="flex items-center gap-3 text-sm">
+                <Phone size={16} className="text-muted-foreground" />
+                <span className="text-card-foreground">{employee.phone}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -76,39 +76,28 @@ export function EmployeeDetailPanel({ employee, onClose }: EmployeeDetailPanelPr
         <div className="space-y-3">
           <h4 className="text-sm font-semibold text-card-foreground uppercase tracking-wider">Professional</h4>
           <div className="space-y-2">
-            <div className="flex items-center gap-3 text-sm">
-              <Building size={16} className="text-muted-foreground" />
-              <span className="text-card-foreground">{employee.department}</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm">
-              <Briefcase size={16} className="text-muted-foreground" />
-              <span className="text-card-foreground">{employee.role}</span>
-            </div>
+            {employee.department && (
+              <div className="flex items-center gap-3 text-sm">
+                <Building size={16} className="text-muted-foreground" />
+                <span className="text-card-foreground">{employee.department}</span>
+              </div>
+            )}
+            {employee.designation && (
+              <div className="flex items-center gap-3 text-sm">
+                <Briefcase size={16} className="text-muted-foreground" />
+                <span className="text-card-foreground">{employee.designation}</span>
+              </div>
+            )}
             <div className="flex items-center gap-3 text-sm">
               <Calendar size={16} className="text-muted-foreground" />
               <span className="text-card-foreground">Joined {joinDate}</span>
             </div>
-          </div>
-        </div>
-
-        {/* Salary Summary */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-card-foreground uppercase tracking-wider">Salary Summary</h4>
-          <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Gross Salary</span>
-              <span className="text-card-foreground font-medium">${grossSalary.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Total Deductions</span>
-              <span className="text-destructive font-medium">-${totalDeductions.toLocaleString()}</span>
-            </div>
-            <div className="border-t border-border pt-2 mt-2">
-              <div className="flex justify-between text-sm">
-                <span className="font-medium text-card-foreground">Net Salary</span>
-                <span className="font-semibold text-primary">${netSalary.toLocaleString()}</span>
+            {employee.gender && (
+              <div className="flex items-center gap-3 text-sm">
+                <Badge size={16} className="text-muted-foreground" />
+                <span className="text-card-foreground capitalize">{employee.gender}</span>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

@@ -7,15 +7,25 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
-    const { role } = useAuth();
+    const { role, isAuthenticated, isLoading } = useAuth();
+
+    // Show loading state while checking authentication
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
+
+    // Redirect to login if not authenticated
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
+    }
 
     // If there are allowed roles and current role is not in the list
     if (allowedRoles && !allowedRoles.includes(role)) {
         // Redirect to appropriate dashboard based on role
-        // If I am an employee trying to access admin, go to /dashboard
-        // If I am an admin trying to access restricted page (unlikely if strictly separated), go to /admin/dashboard
-
-        // However, if we put this on specific routes, we need to know where to send them.
         if (role === 'admin') {
             return <Navigate to="/admin/dashboard" replace />;
         } else {

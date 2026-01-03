@@ -1,8 +1,11 @@
-import { useState, useMemo } from 'react';
-import { Search, Filter, Plus } from 'lucide-react';
-import { employees, departments, Employee } from '@/data/mockData';
+import { useState, useMemo, useEffect } from 'react';
+import { Search, Filter, Plus, Loader2, UserPlus } from 'lucide-react';
+import { employeeService } from '@/services/employee.service';
+import { toastService } from '@/services/toast.service';
+import type { Employee } from '@/types/api.types';
 import { EmployeeTable } from '@/components/admin/employees/EmployeeTable';
 import { EmployeeDetailPanel } from '@/components/admin/employees/EmployeeDetailPanel';
+import { AddEmployeeDialog } from '@/components/admin/AddEmployeeDialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -13,23 +16,60 @@ export default function AdminEmployees() {
   const [selectedDepartment, setSelectedDepartment] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      setIsLoading(true);
+      const data = await employeeService.getAllEmployees();
+      setEmployees(data);
+    } catch (error: any) {
+      toastService.error(error.message || 'Failed to load employees');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Extract unique departments
+  const departments = useMemo(() => {
+    const depts = new Set(employees.map(e => e.department).filter(Boolean));
+    return ['All', ...Array.from(depts)];
+  }, [employees]);
 
   const filteredEmployees = useMemo(() => {
     return employees.filter((employee) => {
+      const fullName = `${employee.first_name} ${employee.last_name}`.toLowerCase();
       const matchesSearch =
-        employee.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        employee.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        employee.email.toLowerCase().includes(searchQuery.toLowerCase());
+        fullName.includes(searchQuery.toLowerCase()) ||
+        employee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        employee.employee_code.toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesDepartment =
         selectedDepartment === 'All' || employee.department === selectedDepartment;
 
-      const matchesStatus =
-        selectedStatus === 'all' || employee.status === selectedStatus;
+      // Since we don't have status in API, we'll skip that filter for now
+      // const matchesStatus =
+      //   selectedStatus === 'all' || employee.status === selectedStatus;
 
-      return matchesSearch && matchesDepartment && matchesStatus;
+      return matchesSearch && matchesDepartment;
     });
-  }, [searchQuery, selectedDepartment, selectedStatus]);
+  }, [employees, searchQuery, selectedDepartment]);
+
+  if (isLoading) {
+    return (
+      <AppLayout title="Employee Management">
+        <div className="flex items-center justify-center h-96">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout title="Employee Management">
@@ -42,7 +82,10 @@ export default function AdminEmployees() {
               Manage and view all employee information
             </p>
           </div>
-          <Button className="w-full sm:w-auto flex items-center gap-2">
+          <Button 
+            className="w-full sm:w-auto flex items-center gap-2"
+            onClick={() => setIsAddDialogOpen(true)}
+          >
             <Plus className="h-4 w-4" />
             Add Employee
           </Button>
@@ -70,10 +113,10 @@ export default function AdminEmployees() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <p className="text-sm text-muted-foreground font-medium mb-2">
-                  Present Today
+                  Full Time
                 </p>
                 <h3 className="text-3xl font-bold text-foreground tracking-tight">
-                  {employees.filter(e => e.status === 'present').length}
+                  {employees.filter(e => e.employment_type === 'Full Time').length}
                 </h3>
               </div>
               <div className="p-3 rounded-lg bg-emerald-500/10">
@@ -85,14 +128,20 @@ export default function AdminEmployees() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <p className="text-sm text-muted-foreground font-medium mb-2">
-                  On Leave
+                  Recent Hires
                 </p>
                 <h3 className="text-3xl font-bold text-foreground tracking-tight">
-                  {employees.filter(e => e.status === 'on-leave').length}
+                  {employees.filter(e => {
+                    if (!e.date_of_joining) return false;
+                    const joinDate = new Date(e.date_of_joining);
+                    const thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                    return joinDate > thirtyDaysAgo;
+                  }).length}
                 </h3>
               </div>
               <div className="p-3 rounded-lg bg-amber-500/10">
-                <Filter className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                <UserPlus className="h-6 w-6 text-amber-600 dark:text-amber-400" />
               </div>
             </div>
           </div>
@@ -142,18 +191,6 @@ export default function AdminEmployees() {
                 </SelectContent>
               </Select>
             </div>
-
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="present">Present</SelectItem>
-                <SelectItem value="on-leave">On Leave</SelectItem>
-                <SelectItem value="absent">Absent</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
@@ -176,7 +213,14 @@ export default function AdminEmployees() {
             onClose={() => setSelectedEmployee(null)}
           />
         )}
+
+        {/* Add Employee Dialog */}
+        <AddEmployeeDialog
+          open={isAddDialogOpen}
+          onOpenChange={setIsAddDialogOpen}
+          onSuccess={fetchEmployees}
+        />
       </div>
-    </AppLayout >
+    </AppLayout>
   );
 }

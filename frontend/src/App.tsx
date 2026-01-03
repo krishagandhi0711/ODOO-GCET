@@ -24,6 +24,7 @@ import AdminCompany from "./pages/admin/AdminCompany";
 import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
+import Payroll from "./pages/Payroll";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/attendance" element={<Attendance />} />
                   <Route path="/time-off" element={<TimeOff />} />
+                  <Route path="/payroll" element={<Payroll />} />
                 </Route>
 
                 {/* Admin Routes - Protected (Admin only) */}

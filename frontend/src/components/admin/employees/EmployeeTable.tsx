@@ -1,28 +1,18 @@
-import { Employee } from '@/data/mockData';
+import type { Employee } from '@/types/api.types';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { DollarSign } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Eye } from 'lucide-react';
 
 interface EmployeeTableProps {
   employees: Employee[];
   onSelectEmployee: (employee: Employee) => void;
-  selectedId?: string;
+  selectedId?: number;
 }
 
-const statusConfig = {
-  present: { label: 'Present', className: 'bg-success/10 text-success' },
-  'on-leave': { label: 'On Leave', className: 'bg-warning/10 text-warning' },
-  absent: { label: 'Absent', className: 'bg-destructive/10 text-destructive' },
-};
-
 export function EmployeeTable({ employees, onSelectEmployee, selectedId }: EmployeeTableProps) {
-  const navigate = useNavigate();
-
-  const handleViewSalary = (e: React.MouseEvent, employeeId: string) => {
-    e.stopPropagation(); // Prevent row click
-    navigate(`/admin/payroll?employee=${employeeId}`);
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
   };
 
   return (
@@ -35,16 +25,16 @@ export function EmployeeTable({ employees, onSelectEmployee, selectedId }: Emplo
                 Employee
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Employee Code
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Department
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Role
+                Designation
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Salary
+                Employment Type
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Actions
@@ -53,9 +43,8 @@ export function EmployeeTable({ employees, onSelectEmployee, selectedId }: Emplo
           </thead>
           <tbody className="divide-y divide-border">
             {employees.map((employee) => {
-              const status = statusConfig[employee.status];
               const isSelected = employee.id === selectedId;
-              const totalSalary = employee.salary.basic + employee.salary.hra + employee.salary.allowances;
+              const initials = getInitials(employee.first_name, employee.last_name);
 
               return (
                 <tr
@@ -68,47 +57,45 @@ export function EmployeeTable({ employees, onSelectEmployee, selectedId }: Emplo
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-9 w-9 bg-secondary">
-                        <AvatarFallback className="bg-secondary text-secondary-foreground text-xs font-medium">
-                          {employee.avatar}
+                      <Avatar className="h-9 w-9 bg-primary/10">
+                        <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
+                          {initials}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="text-sm font-medium text-card-foreground">
-                          {employee.firstName} {employee.lastName}
+                          {employee.first_name} {employee.last_name}
                         </p>
                         <p className="text-xs text-muted-foreground">{employee.email}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm text-card-foreground">{employee.department}</span>
+                    <span className="text-sm font-mono text-card-foreground">{employee.employee_code}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm text-card-foreground">{employee.role}</span>
+                    <span className="text-sm text-card-foreground">{employee.department || 'N/A'}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={cn('rounded-full px-2.5 py-1 text-xs font-medium', status.className)}>
-                      {status.label}
+                    <span className="text-sm text-card-foreground">{employee.designation || 'N/A'}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                      {employee.employment_type || 'Full Time'}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5">
-                      <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                      <span className="text-sm font-semibold text-card-foreground">
-                        ${totalSalary.toLocaleString()}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
                     <Button
+                      variant="ghost"
                       size="sm"
-                      variant="outline"
-                      onClick={(e) => handleViewSalary(e, employee.id)}
-                      className="gap-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectEmployee(employee);
+                      }}
+                      className="h-8 text-xs"
                     >
-                      <DollarSign className="h-4 w-4" />
-                      View Salary
+                      <Eye className="h-3.5 w-3.5 mr-1" />
+                      View Details
                     </Button>
                   </td>
                 </tr>
