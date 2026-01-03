@@ -1,0 +1,262 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dayflow Light Theme (Clean slate/corporate) */
+    --background: 210 20% 98%;
+    --foreground: 220 15% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 15%;
+
+    --primary: 210 100% 50%;
+    /* Pure corporate blue */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 20% 94%;
+    --secondary-foreground: 220 15% 25%;
+
+    --muted: 210 15% 94%;
+    --muted-foreground: 220 10% 45%;
+
+    --accent: 200 80% 55%;
+    /* Cyan accent */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 15% 88%;
+    --input: 210 15% 90%;
+    --ring: 210 100% 50%;
+
+    --radius: 0.5rem;
+
+    /* Glass tokens - Light */
+    --glass-bg: 255 255 255 / 0.9;
+    --glass-border: 210 20% 85%;
+    --glass-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    /* Gradients specific to light mode (very subtle) */
+    --grad-1: 210 50% 96%;
+    --grad-2: 220 40% 95%;
+    --grad-3: 200 30% 97%;
+  }
+
+  .dark {
+    /* Dayflow Space Theme (Enterprise Dark) */
+
+    /* Base: Deep Charcoal / Near-Black (#0b0f14 approx) */
+    --background: 222 25% 6%;
+
+    /* Text: Soft Off-white / Muted Gray */
+    --foreground: 220 15% 90%;
+
+    /* Surfaces: Gunmetal / Dark Slate */
+    --card: 220 20% 10%;
+    --card-foreground: 220 15% 90%;
+
+    --popover: 220 20% 10%;
+    --popover-foreground: 220 15% 90%;
+
+    /* Primary: Muted Electric Blue */
+    --primary: 210 85% 55%;
+    --primary-foreground: 222 25% 6%;
+
+    /* Secondary: Deep slate for secondary actions */
+    --secondary: 220 15% 14%;
+    --secondary-foreground: 220 10% 85%;
+
+    /* Muted: Subtle separators/backgrounds */
+    --muted: 220 15% 12%;
+    --muted-foreground: 220 10% 60%;
+
+    /* Accent: Muted Cyan / Cool Blue */
+    --accent: 195 70% 50%;
+    --accent-foreground: 220 25% 6%;
+
+    --destructive: 0 60% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 16%;
+    --input: 220 15% 14%;
+    --ring: 210 85% 55%;
+
+    /* Glass tokens - Dark Enterprise */
+    --glass-bg: 15 20 26 / 0.8;
+    --glass-border: 220 15% 20%;
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+    /* Gradient Overlay Vars (HSL) */
+    --grad-1: 220 30% 12%;
+    /* Deep Navy */
+    --grad-2: 240 20% 10%;
+    /* Very Faint Slate/Violet */
+    --grad-3: 200 30% 9%;
+    /* Deep Cyan/Teal hint */
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Deep Space Gradient Background (SUBTLE) */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background:
+      radial-gradient(circle at 15% 50%, hsl(var(--grad-1) / 0.45) 0%, transparent 55%),
+      radial-gradient(circle at 85% 30%, hsl(var(--grad-2) / 0.35) 0%, transparent 60%),
+      radial-gradient(circle at 50% 80%, hsl(var(--grad-3) / 0.25) 0%, transparent 50%);
+    /* Very slow slight movement */
+    animation: deepSpaceShift 60s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+
+  @keyframes deepSpaceShift {
+    0% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+
+    100% {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+  }
+}
+
+@layer utilities {
+
+  /* Controlled Premium Glass - Subtle & Professional */
+  .glass {
+    background: rgba(var(--glass-bg));
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow:
+      var(--glass-shadow),
+      inset 0 0 0 1px hsl(var(--glass-border) / 0.1);
+    /* Soft inner glow */
+  }
+
+  .glass-strong {
+    background: rgba(var(--glass-bg));
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow:
+      var(--glass-shadow),
+      inset 0 1px 0 0 hsl(var(--glass-border) / 0.2);
+    /* Highlight top edge */
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Page transitions */
+  .page-enter {
+    animation: pageEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes pageEnter {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Hover lift effect - Subtle */
+  .hover-lift {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Status pulse */
+  .status-pulse {
+    animation: statusPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes statusPulse {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Scrollbar hide utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Premium scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Text selection */
+::selection {
+  background: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
+}
