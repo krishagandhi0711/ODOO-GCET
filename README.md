@@ -1,73 +1,54 @@
-# Welcome to your Lovable project
+# Dayflow Foundation
 
-## Project info
+Dayflow is a modern HR and Attendance Management System built with React, Vite, and Shadcn UI.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+-   **Dashboard**: Overview of attendance, leave balance, and activities.
+-   **Attendance Tracking**: Check-in/Check-out functionality with time calculations.
+-   **Profile Management**: Employee profile with personal and professional details.
+-   **Leave Management**: View and apply for leaves.
+-   **Modern UI**: Glassmorphism design with Dark/Light theme support.
 
-There are several ways of editing your application.
+## Technologies Used
 
-**Use Lovable**
+-   [Vite](https://vitejs.dev/)
+-   [React](https://reactjs.org/)
+-   [TypeScript](https://www.typescriptlang.org/)
+-   [Tailwind CSS](https://tailwindcss.com/)
+-   [shadcn/ui](https://ui.shadcn.com/)
+-   [Lucide React](https://lucide.dev/)
+-   [React Router](https://reactrouter.com/)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/krishagandhi0711/ODOO-GCET.git
+    cd ODOO-GCET
+    ```
 
-**Use your preferred IDE**
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+3.  Run the development server:
+    ```bash
+    npm run dev
+    ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+4.  Open `http://localhost:8080` in your browser.
 
-Follow these steps:
+## Project Structure
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+-   `src/components`: Reusable UI components.
+-   `src/components/layout`: Layout components (Sidebar, Header, AppLayout).
+-   `src/pages`: Main application pages (Dashboard, Profile, Attendance, TimeOff).
+-   `src/contexts`: React Contexts for global state (Auth, Attendance).
+-   `src/data`: Mock data for development.
+-   `src/lib`: Utilities and helpers.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## License
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+MIT
