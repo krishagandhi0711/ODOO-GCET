@@ -724,7 +724,7 @@ This project is developed for the **ODOO Hackathon at GCET**.
 ---
 
 <p align="center">
-  <strong>Built with ❤️ by Team DayFlow</strong>
+  <strong>Built with ❤️ by Krisha , Dhriti , Kavya and Yash</strong>
 </p>
 
 <p align="center">
