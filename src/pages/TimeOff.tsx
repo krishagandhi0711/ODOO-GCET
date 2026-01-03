@@ -3,8 +3,8 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Calendar, 
+import {
+  Calendar,
   Plus,
   X,
   Briefcase,
@@ -28,7 +28,7 @@ export default function TimeOff() {
 
   return (
     <AppLayout title="Time Off">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="w-full mx-auto space-y-6">
         {/* Leave Balance Cards */}
         <div className="grid gap-4 sm:grid-cols-3">
           <LeaveBalanceCard
@@ -94,7 +94,7 @@ export default function TimeOff() {
               </thead>
               <tbody className="divide-y divide-border">
                 {leaveHistory.map((leave, index) => (
-                  <tr 
+                  <tr
                     key={leave.id}
                     className="hover:bg-muted/30 transition-colors animate-fade-in"
                     style={{ animationDelay: `${index * 50}ms` }}
@@ -117,7 +117,7 @@ export default function TimeOff() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <StatusBadge status={leave.status as any} size="sm" />
+                      <StatusBadge status={leave.status as any} />
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-sm text-muted-foreground">{formatDate(leave.appliedOn)}</span>
@@ -222,7 +222,7 @@ function ApplyLeaveModal({ onClose }: ApplyLeaveModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-background/80 backdrop-blur-sm animate-fade-in"
         onClick={onClose}
       />
@@ -268,7 +268,7 @@ function ApplyLeaveModal({ onClose }: ApplyLeaveModalProps) {
                 <span>{selectedType?.label || "Select leave type"}</span>
                 <ChevronDown className={cn("h-4 w-4 transition-transform", isTypeOpen && "rotate-180")} />
               </button>
-              
+
               {isTypeOpen && (
                 <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-lg shadow-soft-lg overflow-hidden animate-fade-in">
                   {leaveTypes.map((type) => (

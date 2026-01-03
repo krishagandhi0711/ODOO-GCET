@@ -152,10 +152,10 @@
     background: rgba(var(--glass-bg));
     backdrop-filter: blur(20px) saturate(140%);
     -webkit-backdrop-filter: blur(20px) saturate(140%);
-    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid hsl(var(--glass-border));
     box-shadow:
       var(--glass-shadow),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+      inset 0 0 0 1px hsl(var(--glass-border) / 0.1);
     /* Soft inner glow */
   }
 
@@ -163,10 +163,10 @@
     background: rgba(var(--glass-bg));
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 0.5px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid hsl(var(--glass-border));
     box-shadow:
       var(--glass-shadow),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+      inset 0 1px 0 0 hsl(var(--glass-border) / 0.2);
     /* Highlight top edge */
   }
 

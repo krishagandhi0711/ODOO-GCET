@@ -3,9 +3,9 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { DashboardCard } from "@/components/DashboardCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { 
-  Clock, 
-  LogIn, 
+import {
+  Clock,
+  LogIn,
   LogOut,
   Calendar,
   ChevronLeft,
@@ -26,7 +26,7 @@ export default function Attendance() {
   const handleClockAction = async () => {
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 800));
-    
+
     if (isCheckedIn) {
       const now = new Date();
       setCheckOutTime(now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }));
@@ -47,7 +47,7 @@ export default function Attendance() {
 
   return (
     <AppLayout title="Attendance">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="w-full mx-auto space-y-6">
         {/* Quick Actions Section */}
         <div className="grid gap-6 lg:grid-cols-[1fr_2fr]">
           {/* Check In/Out Card */}
@@ -70,8 +70,8 @@ export default function Attendance() {
               size="xl"
               className={cn(
                 "w-full h-16 text-lg font-medium transition-all duration-300 mb-6",
-                isCheckedIn 
-                  ? "bg-amber-500 hover:bg-amber-600 text-white" 
+                isCheckedIn
+                  ? "bg-amber-500 hover:bg-amber-600 text-white"
                   : "bg-primary hover:bg-primary/90"
               )}
             >
@@ -174,7 +174,7 @@ export default function Attendance() {
         <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
           <div className="p-6 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <h2 className="text-lg font-semibold text-foreground">Attendance History</h2>
-            
+
             {/* View Toggle */}
             <div className="flex bg-muted rounded-lg p-1">
               {(["daily", "weekly", "monthly"] as ViewMode[]).map((mode) => (
@@ -218,7 +218,7 @@ export default function Attendance() {
               </thead>
               <tbody className="divide-y divide-border">
                 {attendanceHistory.map((record, index) => (
-                  <tr 
+                  <tr
                     key={record.date}
                     className="hover:bg-muted/30 transition-colors animate-fade-in"
                     style={{ animationDelay: `${index * 50}ms` }}
@@ -238,7 +238,7 @@ export default function Attendance() {
                       <span className="text-sm font-medium text-foreground">{record.totalHours}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <StatusBadge status={record.status as any} size="sm" />
+                      <StatusBadge status={record.status as any} />
                     </td>
                   </tr>
                 ))}

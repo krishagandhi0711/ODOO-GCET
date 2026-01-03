@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 interface HeaderProps {
   title: string;
+  isCollapsed: boolean;
 }
 
 // Helper function to calculate working time
@@ -43,7 +44,7 @@ function calculateWorkingTime(checkInTime: string): string {
   }
 }
 
-export function Header({ title }: HeaderProps) {
+export function Header({ title, isCollapsed }: HeaderProps) {
   const { role } = useAuth();
   const { isCheckedIn, toggleCheckIn, isLoading, checkInTime } = useAttendance();
   const navigate = useNavigate();
@@ -71,7 +72,12 @@ export function Header({ title }: HeaderProps) {
   };
 
   return (
-    <header className="fixed top-0 left-64 right-0 z-40 h-16 glass flex items-center justify-between px-6 border-b border-white/5">
+    <header
+      className={cn(
+        "fixed top-0 right-0 z-40 h-16 glass flex items-center justify-between px-6 border-b border-white/5 transition-all duration-300",
+        isCollapsed ? "left-20" : "left-64"
+      )}
+    >
       {/* Left: Dynamic Greeting + Context */}
       <div className="flex items-center gap-4">
         <div>
