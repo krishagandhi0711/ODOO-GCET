@@ -19,6 +19,8 @@ import AdminEmployees from "./pages/admin/AdminEmployees";
 import AdminLeaveApprovals from "./pages/admin/AdminLeaveApprovals";
 import AdminPayroll from "./pages/admin/AdminPayroll";
 import AdminCompany from "./pages/admin/AdminCompany";
+import Landing from "./pages/Landing";
+import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,7 +37,9 @@ const App = () => (
               <Routes>
                 {/* Public/Common Routes */}
                 <Route path="/" element={<Index />} />
+                <Route path="/landing" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
                 <Route path="/first-time-login" element={<FirstTimeLogin />} />
 
                 {/* Employee Routes - Protected */}
