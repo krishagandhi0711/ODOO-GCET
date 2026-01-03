@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -51,8 +51,16 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col transition-theme">
-      {/* Top bar with theme toggle */}
-      <div className="absolute top-4 right-4">
+      {/* Top bar with back button and theme toggle */}
+      <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/landing')}
+          className="gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
         <ThemeToggle />
       </div>
 
@@ -158,6 +166,12 @@ export default function Login() {
 
           {/* Footer */}
           <p className="text-center text-sm text-muted-foreground mt-6">
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-primary hover:text-primary/80 transition-colors font-medium">
+              Sign up
+            </Link>
+          </p>
+          <p className="text-center text-sm text-muted-foreground mt-2">
             Having trouble signing in?{" "}
             <a href="mailto:support@dayflow.com" className="text-primary hover:text-primary/80 transition-colors">
               Contact IT Support
