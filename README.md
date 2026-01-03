@@ -406,7 +406,7 @@ The frontend will start at: `http://localhost:5173`
 
 Open your browser and navigate to:
 
-- **Frontend:** [http://localhost:5173](http://localhost:5173)
+- **Frontend:** [http://localhost:8080](http://localhost:8080)
 - **Backend API:** [http://localhost:3000](http://localhost:3000)
 
 ---
