@@ -710,10 +710,15 @@ npm install
   <tr>
     <td align="center">
       <strong>Team DayFlow</strong><br/>
-      <em>ODOO Hackathon - GCET</em>
+      <em>ODOO Hackathon - GCET</em><br/><br/>
+      👤 Krisha<br/>
+      👤 Dhriti<br/>
+      👤 Kavya<br/>
+      👤 Yash
     </td>
   </tr>
 </table>
+
 
 ---
 
