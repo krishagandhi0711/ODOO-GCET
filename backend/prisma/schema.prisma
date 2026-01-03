@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model attendance_records {
+  id              Int                @id @default(autoincrement())
+  employee_id     Int?
+  attendance_date DateTime           @db.Date
+  check_in        DateTime?          @db.Timestamp(6)
+  check_out       DateTime?          @db.Timestamp(6)
+  total_hours     Decimal?           @db.Decimal(5, 2)
+  extra_hours     Decimal?           @default(0) @db.Decimal(5, 2)
+  status          attendance_status? @default(ABSENT)
+  employees       employees?         @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([employee_id, attendance_date])
+}
+
+model companies {
+  id         Int         @id @default(autoincrement())
+  name       String      @db.VarChar(150)
+  prefix     String      @unique @db.VarChar(10)
+  logo_url   String?
+  created_at DateTime?   @default(now()) @db.Timestamp(6)
+  employees  employees[]
+  users      users[]
+}
+
+model employee_documents {
+  id            Int        @id @default(autoincrement())
+  employee_id   Int?
+  document_type String?    @db.VarChar(50)
+  document_url  String?
+  employees     employees? @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model employee_skills {
+  id            Int        @id @default(autoincrement())
+  employee_id   Int?
+  skill_name    String?    @db.VarChar(100)
+  certification String?    @db.VarChar(150)
+  employees     employees? @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model employees {
+  id                 Int                  @id @default(autoincrement())
+  user_id            Int?                 @unique
+  company_id         Int?
+  full_name          String?              @db.VarChar(150)
+  mobile             String?              @db.VarChar(15)
+  department         String?              @db.VarChar(100)
+  manager_id         Int?
+  location           String?              @db.VarChar(100)
+  dob                DateTime?            @db.Date
+  address            String?
+  nationality        String?              @db.VarChar(50)
+  marital_status     String?              @db.VarChar(20)
+  job_position       String?              @db.VarChar(100)
+  date_of_joining    DateTime?            @db.Date
+  employee_code      String?              @unique @db.VarChar(30)
+  pan_no             String?              @db.VarChar(20)
+  uan_no             String?              @db.VarChar(20)
+  about              String?
+  love_about_job     String?
+  interests          String?
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  attendance_records attendance_records[]
+  employee_documents employee_documents[]
+  employee_skills    employee_skills[]
+  companies          companies?           @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employees          employees?           @relation("employeesToemployees", fields: [manager_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_employees    employees[]          @relation("employeesToemployees")
+  users              users?               @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  leave_balances     leave_balances[]
+  leave_requests     leave_requests[]
+  salary_structures  salary_structures?
+}
+
+model leave_balances {
+  employee_id Int
+  leave_type  leave_type
+  total_days  Int?
+  used_days   Int?       @default(0)
+  employees   employees  @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([employee_id, leave_type])
+}
+
+model leave_requests {
+  id          Int           @id @default(autoincrement())
+  employee_id Int?
+  leave_type  leave_type?
+  start_date  DateTime?     @db.Date
+  end_date    DateTime?     @db.Date
+  reason      String?
+  status      leave_status? @default(PENDING)
+  applied_at  DateTime?     @default(now()) @db.Timestamp(6)
+  employees   employees?    @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model roles {
+  id    Int       @id @default(autoincrement())
+  name  role_type @unique
+  users users[]
+}
+
+model salary_components {
+  id                        Int                @id @default(autoincrement())
+  salary_structure_id       Int?
+  basic                     Decimal?           @db.Decimal(10, 2)
+  hra                       Decimal?           @db.Decimal(10, 2)
+  standard_allowance        Decimal?           @db.Decimal(10, 2)
+  performance_bonus_percent Decimal?           @db.Decimal(5, 2)
+  lta_percent               Decimal?           @db.Decimal(5, 2)
+  pf_employee_percent       Decimal?           @db.Decimal(5, 2)
+  pf_employer_percent       Decimal?           @db.Decimal(5, 2)
+  professional_tax          Decimal?           @db.Decimal(10, 2)
+  salary_structures         salary_structures? @relation(fields: [salary_structure_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model salary_structures {
+  id                Int                 @id @default(autoincrement())
+  employee_id       Int?                @unique
+  monthly_wage      Decimal             @db.Decimal(10, 2)
+  created_at        DateTime?           @default(now()) @db.Timestamp(6)
+  salary_components salary_components[]
+  employees         employees?          @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  id             Int        @id @default(autoincrement())
+  company_id     Int?
+  role_id        Int?
+  login_id       String     @unique @db.VarChar(30)
+  email          String     @unique @db.VarChar(150)
+  password       String
+  is_first_login Boolean?   @default(true)
+  created_at     DateTime?  @default(now()) @db.Timestamp(6)
+  employees      employees?
+  companies      companies? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  roles          roles?     @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum attendance_status {
+  PRESENT
+  ABSENT
+  LEAVE
+  HALF_DAY
+}
+
+enum leave_status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum leave_type {
+  PAID
+  SICK
+  UNPAID
+}
+
+enum role_type {
+  ADMIN
+  HR
+  EMPLOYEE
+}
