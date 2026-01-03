@@ -82,7 +82,7 @@ export function Header({ title, isCollapsed }: HeaderProps) {
       <div className="flex items-center gap-4">
         <div>
           <h1 className="text-lg font-semibold text-foreground">
-            {getGreeting()}, John
+            {getGreeting()}, Krisha
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
             {getCurrentDate()} • {title}
@@ -151,11 +151,11 @@ export function Header({ title, isCollapsed }: HeaderProps) {
             <button className="flex items-center gap-3 p-1.5 pr-3 rounded-lg hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/10">
               <Avatar className="h-8 w-8 ring-2 ring-white/10">
                 <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white text-sm font-semibold">
-                  JD
+                  KG
                 </AvatarFallback>
               </Avatar>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-medium leading-none text-foreground">John Doe</p>
+                <p className="text-sm font-medium leading-none text-foreground">Krisha Gandhi</p>
                 <p className="text-xs text-muted-foreground mt-1 capitalize">{role}</p>
               </div>
             </button>

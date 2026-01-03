@@ -1,10 +1,10 @@
 // Mock employee data
 export const currentEmployee = {
   id: "EMP-2024-001",
-  firstName: "John",
-  lastName: "Doe",
-  fullName: "John Doe",
-  email: "john.doe@company.com",
+  firstName: "Krisha",
+  lastName: "Gandhi",
+  fullName: "Krisha Gandhi",
+  email: "krisha.gandhi@company.com",
   phone: "+1 (555) 123-4567",
   role: "Senior Software Engineer",
   department: "Engineering",
@@ -13,10 +13,10 @@ export const currentEmployee = {
   office: "San Francisco, CA",
   startDate: "2022-03-15",
   dateOfBirth: "1990-06-20",
-  gender: "Male",
+  gender: "Female",
   address: "123 Main Street, San Francisco, CA 94102",
   emergencyContact: {
-    name: "Sarah Doe",
+    name: "Sarah Gandhi",
     relationship: "Spouse",
     phone: "+1 (555) 987-6543",
   },

@@ -14,7 +14,10 @@ import {
     FileCheck,
     Building2,
     Zap,
-    Lock
+    Lock,
+    Cpu,
+    Globe,
+    Rocket
 } from 'lucide-react';
 
 export default function Landing() {
@@ -22,10 +25,15 @@ export default function Landing() {
 
     return (
         <div className="min-h-screen bg-background relative selection:bg-primary/20">
-            {/* Global Background Grid Pattern */}
-            <div className="fixed inset-0 pointer-events-none z-0">
+            {/* Global Background Grid Pattern - Enhanced with atmospheric orbs */}
+            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--primary)/0.05)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--primary)/0.05)_1px,transparent_1px)] bg-[size:45px_45px]" />
                 <div className="absolute inset-0 bg-gradient-to-b from-background/0 via-background/20 to-background" />
+
+                {/* Atmospheric Ambient Orbs */}
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[20%] right-[-5%] w-[30%] h-[30%] bg-accent/10 rounded-full blur-[100px] animate-bounce-slow" />
+                <div className="absolute top-[40%] right-[10%] w-[20%] h-[20%] bg-primary/5 rounded-full blur-[80px]" />
             </div>
 
             {/* Navigation - Floating & Rounded */}
@@ -41,14 +49,21 @@ export default function Landing() {
                         </div>
 
                         {/* Right side */}
-                        <div className="flex items-center gap-4">
-                            <ThemeToggle />
-                            <Button
-                                onClick={() => navigate('/login')}
-                                className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300 hover:scale-105 px-8 h-10 font-bold"
-                            >
-                                Sign In
-                            </Button>
+                        <div className="flex items-center gap-8">
+                            <div className="hidden md:flex items-center gap-8">
+                                <a href="#features" className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-all">Features</a>
+                                <a href="#pricing" className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-all">Pricing</a>
+                                <a href="mailto:support@dayflow.com" className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-all">Support</a>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <ThemeToggle />
+                                <Button
+                                    onClick={() => navigate('/login')}
+                                    className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300 hover:scale-105 px-8 h-10 font-bold"
+                                >
+                                    Sign In
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -125,10 +140,10 @@ export default function Landing() {
                                     <div className="flex items-center justify-between mb-8 pb-5 border-b border-white/5">
                                         <div className="flex items-center gap-4">
                                             <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground font-black text-lg shadow-lg">
-                                                JD
+                                                KG
                                             </div>
                                             <div>
-                                                <div className="font-bold text-foreground text-lg">John Doe</div>
+                                                <div className="font-bold text-foreground text-lg">Krisha Gandhi</div>
                                                 <div className="text-sm text-muted-foreground font-medium">Lead Software Engineer</div>
                                             </div>
                                         </div>
@@ -196,7 +211,7 @@ export default function Landing() {
                 </section>
 
                 {/* Core Modules Section */}
-                <section className="py-32 relative overflow-hidden">
+                <section id="features" className="py-32 relative overflow-hidden">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
                         <div className="text-center max-w-3xl mx-auto mb-20 animate-in fade-in slide-in-from-bottom-8">
                             <h2 className="text-5xl font-black text-foreground mb-6 leading-tight">
@@ -230,14 +245,15 @@ export default function Landing() {
                                     desc: 'Precision payroll with multi-currency support and localized tax compliance.'
                                 }
                             ].map((module, i) => (
-                                <div key={i} className="group p-8 rounded-[2rem] bg-card/50 border border-border/50 hover:border-primary/50 hover:shadow-2xl transition-all duration-500 backdrop-blur-sm">
-                                    <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform">
-                                        <module.icon className="h-7 w-7 text-primary" />
+                                <div key={i} className="group p-8 rounded-[2.5rem] bg-secondary/30 border-2 border-foreground/5 hover:border-primary/40 hover:bg-secondary/50 hover:shadow-2xl transition-all duration-500 backdrop-blur-sm relative overflow-hidden">
+                                    <div className="absolute top-6 right-8 text-4xl font-black text-foreground/5 group-hover:text-primary/10 transition-colors uppercase tracking-tighter">0{i + 1}</div>
+                                    <div className="h-16 w-16 rounded-[1.5rem] bg-primary/10 flex items-center justify-center mb-8 border border-primary/20 group-hover:scale-110 group-hover:rotate-3 transition-transform group-hover:bg-primary group-hover:text-white group-hover:shadow-lg group-hover:shadow-primary/20">
+                                        <module.icon className="h-8 w-8 text-primary group-hover:text-white transition-colors" />
                                     </div>
-                                    <h3 className="text-2xl font-bold text-foreground mb-3">
+                                    <h3 className="text-2xl font-black text-foreground mb-4 uppercase tracking-tight">
                                         {module.title}
                                     </h3>
-                                    <p className="text-muted-foreground leading-relaxed font-medium">
+                                    <p className="text-muted-foreground leading-relaxed font-bold text-sm uppercase tracking-wide opacity-80 group-hover:opacity-100 transition-opacity">
                                         {module.desc}
                                     </p>
                                 </div>
@@ -326,6 +342,125 @@ export default function Landing() {
                     </div>
                 </section>
 
+                {/* Pricing Section - Architectural Tiering */}
+                <section id="pricing" className="py-32 relative">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                        <div className="text-center max-w-3xl mx-auto mb-20 animate-in fade-in slide-in-from-bottom-8">
+                            <h2 className="text-5xl font-black text-foreground mb-6 leading-tight">
+                                Scalable <span className="text-primary font-black">Architecture</span>
+                            </h2>
+                            <p className="text-xl text-muted-foreground font-medium">
+                                Professional resource management infrastructure tailored for organizations of every scale.
+                            </p>
+                        </div>
+
+                        <div className="grid lg:grid-cols-3 gap-8 items-stretch pt-12">
+                            {/* Starter Tier */}
+                            <div className="p-10 rounded-[3rem] bg-secondary/20 border-2 border-foreground/5 shadow-xl hover:shadow-2xl transition-all duration-500 group relative overflow-hidden flex flex-col justify-between">
+                                <div className="space-y-8 relative z-10">
+                                    <div className="flex items-center justify-between">
+                                        <div className="h-14 w-14 rounded-2xl bg-foreground/5 flex items-center justify-center border border-foreground/10">
+                                            <Rocket className="h-7 w-7 text-foreground/40" />
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-foreground/5 px-4 py-1.5 rounded-full border border-foreground/5">Base Protocol</span>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <h3 className="text-3xl font-black text-foreground uppercase tracking-tight">Essential</h3>
+                                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Operations Core</p>
+                                    </div>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-6xl font-black text-foreground tracking-tighter">$0</span>
+                                        <span className="text-sm font-black text-muted-foreground uppercase opacity-40">/mo</span>
+                                    </div>
+                                    <div className="h-px w-full bg-foreground/10" />
+                                    <div className="space-y-5">
+                                        {['Up to 25 Employees', 'Core Identity Profiles', 'Base Clock Protocol', 'Standard Leave Units'].map((f, i) => (
+                                            <div key={i} className="flex items-center gap-4">
+                                                <div className="h-5 w-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                                                    <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                                                </div>
+                                                <span className="text-sm font-bold text-foreground/70 uppercase tracking-wide">{f}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <Button variant="outline" className="w-full h-16 rounded-2xl border-2 border-foreground/10 font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-all mt-10">
+                                    Initialize Unit
+                                </Button>
+                            </div>
+
+                            {/* Business Tier - THE HIGHLIGHT */}
+                            <div className="p-10 rounded-[3rem] bg-secondary/80 border-2 border-primary shadow-2xl hover:shadow-primary/20 transition-all duration-500 group relative overflow-hidden scale-105 z-20 flex flex-col justify-between">
+                                <div className="absolute top-0 right-0 p-8 flex items-center gap-2">
+                                    <div className="px-4 py-1.5 rounded-full bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20">Recommended Configuration</div>
+                                </div>
+                                <div className="space-y-8 relative z-10 pt-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center shadow-2xl shadow-primary/30">
+                                            <Cpu className="h-9 w-9 text-white" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <h3 className="text-4xl font-black text-foreground uppercase tracking-tight">Growth</h3>
+                                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Advanced Neural Engine</p>
+                                    </div>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-7xl font-black text-foreground tracking-tighter">$49</span>
+                                        <span className="text-sm font-black text-muted-foreground uppercase opacity-40">/mo</span>
+                                    </div>
+                                    <div className="h-px w-full bg-primary/20" />
+                                    <div className="space-y-5">
+                                        {['Up to 250 Employees', 'Integrated Payroll Unit', 'Advanced Document Matrix', 'Analytics Intelligence', 'Custom Approval Flows'].map((f, i) => (
+                                            <div key={i} className="flex items-center gap-4">
+                                                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                                                </div>
+                                                <span className="text-sm font-black text-foreground uppercase tracking-tight">{f}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <Button className="w-full h-18 rounded-2xl bg-primary text-white font-black uppercase tracking-widest shadow-2xl shadow-primary/30 hover:scale-[1.02] transition-all mt-12 text-base">
+                                    Deploy Infrastructure
+                                </Button>
+                            </div>
+
+                            {/* Enterprise Tier */}
+                            <div className="p-10 rounded-[3rem] bg-secondary/20 border-2 border-foreground/5 shadow-xl hover:shadow-2xl transition-all duration-500 group relative overflow-hidden flex flex-col justify-between">
+                                <div className="space-y-8 relative z-10">
+                                    <div className="flex items-center justify-between">
+                                        <div className="h-14 w-14 rounded-2xl bg-foreground/5 flex items-center justify-center border border-foreground/10">
+                                            <Globe className="h-7 w-7 text-foreground/40" />
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-foreground/5 px-4 py-1.5 rounded-full border border-foreground/5">Global Access</span>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <h3 className="text-3xl font-black text-foreground uppercase tracking-tight">Sovereign</h3>
+                                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Universal Command</p>
+                                    </div>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-6xl font-black text-foreground tracking-tighter">Custom</span>
+                                    </div>
+                                    <div className="h-px w-full bg-foreground/10" />
+                                    <div className="space-y-5">
+                                        {['Unlimited Employee Matrix', 'Multi-Regional Currency', 'Custom Policy Forge', 'White-label Architecture', '24/7 Priority Ops'].map((f, i) => (
+                                            <div key={i} className="flex items-center gap-4">
+                                                <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                                                    <CheckCircle2 className="h-3 w-3 text-primary" />
+                                                </div>
+                                                <span className="text-sm font-bold text-foreground/70 uppercase tracking-wide">{f}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <Button variant="outline" className="w-full h-16 rounded-2xl border-2 border-foreground/10 font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-all mt-10">
+                                    Contact Command
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Security Section */}
                 <section className="py-32">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -339,7 +474,7 @@ export default function Landing() {
                                     <div className="space-y-4">
                                         <h2 className="text-5xl font-black text-foreground leading-[1.1]">
                                             Sovereign Data <br />
-                                            <span className="text-primary italic">Security</span>
+                                            <span className="text-primary font-black">Security</span>
                                         </h2>
                                         <p className="text-xl text-muted-foreground leading-relaxed font-medium">
                                             Your organizational data is treated with military-grade precision. Everything from AWS encryption to physical server security is managed for your peace of mind.
@@ -385,7 +520,7 @@ export default function Landing() {
                         <div className="absolute -top-10 left-1/2 -translate-x-1/2 h-40 w-40 bg-primary/30 rounded-full blur-[80px]" />
                         <h2 className="text-6xl font-black text-foreground mb-8 tracking-tighter">
                             Ready for the <br />
-                            <span className="text-primary">Future</span> of HR?
+                            <span className="text-primary font-black">Future</span> of HR?
                         </h2>
                         <p className="text-xl text-muted-foreground mb-12 font-medium">
                             Join the elite organizations transforming their workforce management with Dayflow.

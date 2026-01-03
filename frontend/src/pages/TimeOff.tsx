@@ -13,7 +13,9 @@ import {
   Clock,
   CalendarDays,
   Loader2,
-  ChevronDown
+  ChevronDown,
+  History,
+  Info
 } from "lucide-react";
 import { leaveBalance, leaveHistory, leaveTypes } from "@/data/mockData";
 import { cn } from "@/lib/utils";
@@ -23,104 +25,101 @@ export default function TimeOff() {
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
   };
 
   return (
-    <AppLayout title="Time Off">
-      <div className="w-full mx-auto space-y-6">
-        {/* Leave Balance Cards */}
-        <div className="grid gap-4 sm:grid-cols-3">
+    <AppLayout title="Time Off Management">
+      <div className="max-w-[1200px] mx-auto space-y-8 pb-16 px-4">
+
+        {/* Section 1: Allocation Overview */}
+        <div className="grid gap-6 md:grid-cols-3">
           <LeaveBalanceCard
-            title="Paid Leave"
+            title="Paid Annual Leave"
             used={leaveBalance.paidLeave.used}
             total={leaveBalance.paidLeave.total}
             icon={Briefcase}
-            color="primary"
+            isPrimary
           />
           <LeaveBalanceCard
-            title="Sick Leave"
+            title="Sick & Medical"
             used={leaveBalance.sickLeave.used}
             total={leaveBalance.sickLeave.total}
             icon={Heart}
-            color="amber"
           />
           <LeaveBalanceCard
             title="Personal Leave"
             used={leaveBalance.personalLeave.used}
             total={leaveBalance.personalLeave.total}
             icon={User}
-            color="violet"
           />
         </div>
 
-        {/* Apply Leave Button & History */}
-        <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
-          <div className="p-6 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">Leave History</h2>
-              <p className="text-sm text-muted-foreground mt-1">View and manage your time off requests</p>
+        {/* Section 2: Actions & History */}
+        <div className="bg-secondary rounded-[2.5rem] border border-foreground/10 shadow-xl overflow-hidden flex flex-col">
+          <div className="p-8 border-b border-foreground/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <History className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-lg font-black tracking-tight text-foreground uppercase italic">Request Archive</h2>
+                <p className="text-xs font-bold text-muted-foreground uppercase">Historical Leave Tracking</p>
+              </div>
             </div>
-            <Button onClick={() => setIsModalOpen(true)} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Apply Leave
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              className="h-14 px-8 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:scale-[1.02]"
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              Initiate Request
             </Button>
           </div>
 
-          {/* Leave History Table */}
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border bg-muted/30">
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                    Type
-                  </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                    Duration
-                  </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                    Days
-                  </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                    Reason
-                  </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                    Status
-                  </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                    Applied On
-                  </th>
+                <tr className="bg-foreground/5 text-muted-foreground">
+                  <Th label="Classification" />
+                  <Th label="Duration Range" />
+                  <Th label="Units" />
+                  <Th label="Condition/Reason" />
+                  <Th label="Status" />
+                  <Th label="Timestamp" className="text-right" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-foreground/5">
                 {leaveHistory.map((leave, index) => (
                   <tr
                     key={leave.id}
-                    className="hover:bg-muted/30 transition-colors animate-fade-in"
+                    className="group hover:bg-primary/[0.02] transition-colors animate-in fade-in slide-in-from-bottom-2 duration-500"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-foreground">{leave.type}</span>
+                    <td className="px-8 py-6">
+                      <span className="text-sm font-black text-foreground uppercase">{leave.type}</span>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-foreground">
+                    <td className="px-8 py-6">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-80">
                         {formatDate(leave.startDate)}
-                        {leave.startDate !== leave.endDate && ` - ${formatDate(leave.endDate)}`}
+                        {leave.startDate !== leave.endDate && (
+                          <span className="mx-2 text-primary">—</span>
+                        )}
+                        {leave.startDate !== leave.endDate && formatDate(leave.endDate)}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-foreground">{leave.days}</span>
+                    <td className="px-8 py-6">
+                      <span className="text-sm font-black text-foreground">{leave.days} <span className="text-[10px] text-muted-foreground">DAYS</span></span>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-muted-foreground max-w-[200px] truncate block">
-                        {leave.reason}
+                    <td className="px-8 py-6">
+                      <span className="text-xs font-medium text-muted-foreground max-w-[200px] truncate block italic">
+                        "{leave.reason}"
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-8 py-6">
                       <StatusBadge status={leave.status as any} />
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-muted-foreground">{formatDate(leave.appliedOn)}</span>
+                    <td className="px-8 py-6 text-right">
+                      <span className="text-[10px] font-black text-muted-foreground uppercase opacity-60 italic">{formatDate(leave.appliedOn)}</span>
                     </td>
                   </tr>
                 ))}
@@ -138,65 +137,52 @@ export default function TimeOff() {
   );
 }
 
-interface LeaveBalanceCardProps {
-  title: string;
-  used: number;
-  total: number;
-  icon: typeof Briefcase;
-  color: "primary" | "amber" | "violet";
-}
+{/* REFINED ATOMS */ }
 
-function LeaveBalanceCard({ title, used, total, icon: Icon, color }: LeaveBalanceCardProps) {
+function LeaveBalanceCard({ title, used, total, icon: Icon, isPrimary }: { title: string, used: number, total: number, icon: any, isPrimary?: boolean }) {
   const remaining = total - used;
   const percentage = (remaining / total) * 100;
 
-  const colorClasses = {
-    primary: {
-      bg: "bg-primary/10",
-      icon: "text-primary",
-      bar: "bg-primary",
-    },
-    amber: {
-      bg: "bg-amber-500/10",
-      icon: "text-amber-600 dark:text-amber-400",
-      bar: "bg-amber-500",
-    },
-    violet: {
-      bg: "bg-violet-500/10",
-      icon: "text-violet-600 dark:text-violet-400",
-      bar: "bg-violet-500",
-    },
-  };
-
   return (
-    <div className="bg-card rounded-xl border border-border p-6 shadow-soft hover:shadow-soft-md transition-all duration-300 hover:-translate-y-0.5">
-      <div className="flex items-center gap-3 mb-4">
-        <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center", colorClasses[color].bg)}>
-          <Icon className={cn("h-5 w-5", colorClasses[color].icon)} />
+    <div className="p-8 rounded-[2.5rem] bg-secondary border border-foreground/10 hover:border-primary/20 transition-all group shadow-lg flex flex-col justify-between">
+      <div className="flex items-start justify-between">
+        <div className={cn(
+          "h-12 w-12 rounded-2xl flex items-center justify-center transition-transform group-hover:rotate-3 shadow-xl",
+          isPrimary ? "bg-primary text-white" : "bg-foreground text-background"
+        )}>
+          <Icon className="h-6 w-6" />
         </div>
-        <span className="text-sm font-medium text-muted-foreground">{title}</span>
+        <div className="text-right">
+          <span className="text-[10px] font-black text-primary uppercase tracking-widest">{Math.round(percentage)}% SECURE</span>
+        </div>
       </div>
 
-      <div className="flex items-end justify-between mb-3">
-        <div>
-          <span className="text-3xl font-bold text-foreground">{remaining}</span>
-          <span className="text-muted-foreground ml-1">/ {total}</span>
+      <div className="mt-8 space-y-4">
+        <div className="flex items-end justify-between">
+          <p className="text-4xl font-black text-foreground tracking-tighter">{remaining}</p>
+          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1.5">REMAINING / {total}</p>
         </div>
-        <span className="text-sm text-muted-foreground">days left</span>
-      </div>
 
-      <div className="h-2 bg-muted rounded-full overflow-hidden">
-        <div
-          className={cn("h-full rounded-full transition-all duration-500", colorClasses[color].bar)}
-          style={{ width: `${percentage}%` }}
-        />
+        <div className="space-y-2">
+          <div className="h-1.5 w-full bg-foreground/5 rounded-full overflow-hidden">
+            <div
+              className={cn("h-full transition-all duration-1000", isPrimary ? "bg-primary" : "bg-foreground")}
+              style={{ width: `${percentage}%` }}
+            />
+          </div>
+          <p className="text-xs font-black text-foreground uppercase tracking-tight italic">{title}</p>
+        </div>
       </div>
     </div>
-  );
+  )
 }
 
-interface ApplyLeaveModalProps {
-  onClose: () => void;
+function Th({ label, className }: { label: string, className?: string }) {
+  return (
+    <th className={cn("px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]", className)}>
+      {label}
+    </th>
+  )
 }
 
 function ApplyLeaveModal({ onClose }: ApplyLeaveModalProps) {
@@ -221,56 +207,42 @@ function ApplyLeaveModal({ onClose }: ApplyLeaveModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm animate-fade-in"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-background/90 backdrop-blur-xl animate-fade-in" onClick={onClose} />
 
-      {/* Modal */}
-      <div className="relative bg-card rounded-2xl border border-border shadow-soft-lg w-full max-w-lg animate-fade-in">
+      <div className="relative bg-secondary rounded-[3rem] border border-foreground/10 shadow-2xl w-full max-w-xl animate-in zoom-in-95 duration-300 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <CalendarDays className="h-5 w-5 text-primary" />
+        <div className="p-10 border-b border-foreground/5 flex items-center justify-between">
+          <div className="flex items-center gap-5">
+            <div className="h-14 w-14 rounded-2xl bg-primary text-white flex items-center justify-center shadow-2xl shadow-primary/20">
+              <CalendarDays className="h-8 w-8" />
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">Apply for Leave</h2>
-              <p className="text-sm text-muted-foreground">Submit a new time off request</p>
+            <div className="space-y-1">
+              <h2 className="text-2xl font-black tracking-tighter text-foreground uppercase italic leading-none">Leave Protocol</h2>
+              <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Institutional Request Unit</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted transition-colors"
-          >
-            <X className="h-4 w-4 text-muted-foreground" />
+          <button onClick={onClose} className="h-10 w-10 rounded-xl bg-foreground/5 flex items-center justify-center hover:bg-foreground/10 transition-colors">
+            <X className="h-5 w-5 text-muted-foreground" />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* Leave Type */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-foreground">
-              Leave Type
-            </label>
+        {/* Action Body */}
+        <form onSubmit={handleSubmit} className="p-10 space-y-8">
+          <div className="space-y-3">
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-2">Classification Type</label>
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setIsTypeOpen(!isTypeOpen)}
-                className={cn(
-                  "w-full flex items-center justify-between h-11 px-4 rounded-lg border bg-background text-left transition-all duration-200",
-                  "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:ring-offset-background",
-                  formData.type ? "text-foreground" : "text-muted-foreground"
-                )}
+                className="w-full h-16 px-8 rounded-2xl bg-background/50 border border-foreground/10 flex items-center justify-between group transition-all focus:border-primary/50"
               >
-                <span>{selectedType?.label || "Select leave type"}</span>
-                <ChevronDown className={cn("h-4 w-4 transition-transform", isTypeOpen && "rotate-180")} />
+                <span className={cn("text-xs font-black uppercase tracking-widest", formData.type ? "text-foreground" : "text-muted-foreground")}>
+                  {selectedType?.label || "Select Protocol Type"}
+                </span>
+                <ChevronDown className={cn("h-4 w-4 text-primary transition-transform", isTypeOpen && "rotate-180")} />
               </button>
-
               {isTypeOpen && (
-                <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-lg shadow-soft-lg overflow-hidden animate-fade-in">
+                <div className="absolute z-50 top-full inset-x-0 mt-3 bg-secondary border border-foreground/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
                   {leaveTypes.map((type) => (
                     <button
                       key={type.value}
@@ -279,10 +251,7 @@ function ApplyLeaveModal({ onClose }: ApplyLeaveModalProps) {
                         setFormData({ ...formData, type: type.value });
                         setIsTypeOpen(false);
                       }}
-                      className={cn(
-                        "w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors",
-                        formData.type === type.value && "bg-accent text-accent-foreground"
-                      )}
+                      className="w-full text-left px-8 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all border-b border-foreground/5 last:border-none"
                     >
                       {type.label}
                     </button>
@@ -292,88 +261,58 @@ function ApplyLeaveModal({ onClose }: ApplyLeaveModalProps) {
             </div>
           </div>
 
-          {/* Date Range */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-foreground">
-                Start Date
-              </label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="date"
-                  value={formData.startDate}
-                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                  className="pl-10"
-                  required
-                />
-              </div>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-2">Deployment Start</label>
+              <Input
+                type="date"
+                value={formData.startDate}
+                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                className="h-16 rounded-2xl bg-background/50 border border-foreground/10 px-8 text-xs font-black uppercase tracking-widest"
+                required
+              />
             </div>
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-foreground">
-                End Date
-              </label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="date"
-                  value={formData.endDate}
-                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                  className="pl-10"
-                  required
-                />
-              </div>
+            <div className="space-y-3">
+              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-2">Deployment End</label>
+              <Input
+                type="date"
+                value={formData.endDate}
+                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                className="h-16 rounded-2xl bg-background/50 border border-foreground/10 px-8 text-xs font-black uppercase tracking-widest"
+                required
+              />
             </div>
           </div>
 
-          {/* Remarks */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-foreground">
-              Remarks
-            </label>
+          <div className="space-y-3">
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-2">Mission Justification</label>
             <textarea
               value={formData.remarks}
               onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
-              placeholder="Briefly describe the reason for your leave..."
-              rows={3}
-              className={cn(
-                "w-full rounded-lg border border-input bg-background px-4 py-3 text-sm shadow-inner-soft transition-all duration-200",
-                "placeholder:text-muted-foreground",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background focus-visible:border-primary/50",
-                "resize-none"
-              )}
+              placeholder="Provide detailed reasoning for this absence request..."
+              className="w-full h-32 rounded-2xl bg-background/50 border border-foreground/10 p-8 text-xs font-bold text-foreground resize-none focus:outline-none focus:border-primary/50 transition-all"
               required
             />
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1"
-              disabled={isSubmitting}
-            >
-              Cancel
+          <div className="flex gap-4 pt-4">
+            <Button onClick={onClose} variant="ghost" className="flex-1 h-16 rounded-2xl text-[10px] font-black uppercase tracking-widest">
+              Abstain
             </Button>
             <Button
               type="submit"
-              className="flex-1"
               disabled={isSubmitting || !formData.type || !formData.startDate || !formData.endDate}
+              className="flex-1 h-16 rounded-2xl bg-primary text-white font-black uppercase tracking-widest shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-all"
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                "Submit Request"
-              )}
+              {isSubmitting ? <Loader2 className="h-6 w-6 animate-spin" /> : "Authorize Request"}
             </Button>
           </div>
         </form>
       </div>
     </div>
   );
+}
+
+interface ApplyLeaveModalProps {
+  onClose: () => void;
 }

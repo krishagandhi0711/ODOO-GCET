@@ -1,27 +1,48 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { DashboardCard } from "@/components/DashboardCard";
-import { StatusBadge } from "@/components/StatusBadge";
-import { Button } from "@/components/ui/button";
 import {
   Clock,
   Calendar,
+  FileText,
+  Users,
   TrendingUp,
+  CalendarCheck,
+  UserX,
+  Activity,
+  ChevronRight,
   LogIn,
   LogOut,
-  CheckCircle2
+  ArrowRight,
+  FileCheck,
+  Sparkles,
+  Timer
 } from "lucide-react";
-import { currentEmployee, todayAttendance, weeklyHours, leaveBalance } from "@/data/mockData";
+import { Button } from "@/components/ui/button";
+import {
+  AreaChart,
+  Area,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ComposedChart,
+  ReferenceLine
+} from "recharts";
+import {
+  currentEmployee,
+  dashboardStats,
+  weeklyHours,
+  leaveBalance
+} from "@/data/mockData";
 import { cn } from "@/lib/utils";
-
 import { useAttendance } from "@/contexts/AttendanceContext";
 
 export default function Dashboard() {
-  const { isCheckedIn, checkInTime, checkOutTime, toggleCheckIn, isLoading } = useAttendance();
-
-  const handleClockAction = async () => {
-    await toggleCheckIn();
-  };
+  const navigate = useNavigate();
+  const { isCheckedIn, checkInTime, toggleCheckIn, isLoading } = useAttendance();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -30,187 +51,240 @@ export default function Dashboard() {
     return "Good evening";
   };
 
-  const totalWeeklyHours = weeklyHours.reduce((sum, day) => sum + day.hours, 0);
-  const maxHours = Math.max(...weeklyHours.map(d => d.hours));
+  const getStatusColor = (dayHours: number) => {
+    if (dayHours >= 8) return "bg-primary shadow-[0_0_12px_rgba(var(--primary-rgb),0.3)]";
+    if (dayHours > 0) return "bg-primary/40";
+    return "bg-muted/40";
+  };
 
   return (
     <AppLayout title="Dashboard">
-      <div className="space-y-8 animate-in fade-in duration-500">
-        {/* Welcome Section / Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/40 pb-6">
-          <div>
-            <h2 className="text-3xl font-bold text-foreground mb-1 tracking-tight">
-              {getGreeting()}, {currentEmployee.firstName}
-            </h2>
-            <p className="text-muted-foreground font-medium">Here's your work summary for today.</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:block text-right mr-2">
-              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Current Status</p>
+      <div className="space-y-10 pb-10 animate-in fade-in duration-700">
+
+        {/* 1. Hero Welcome Section - Enhanced Visual Hierarchy */}
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-background to-accent/5 p-8 lg:p-12 border border-primary/10">
+          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 h-96 w-96 bg-primary/5 rounded-full blur-[100px]" />
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-widest uppercase border border-primary/20">
+                <Sparkles className="h-3 w-3" />
+                DASHBOARD OVERVIEW
+              </div>
+              <h1 className="text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-tight">
+                {getGreeting()}, <br />
+                <span className="text-primary italic">{currentEmployee.firstName}</span>
+              </h1>
+              <p className="text-lg text-muted-foreground font-medium max-w-md">
+                You've completed <span className="text-foreground font-bold">85%</span> of your weekly targets. Keep it up!
+              </p>
             </div>
-            <StatusBadge status={isCheckedIn ? "present" : "absent"} className="scale-110" />
+
+            {/* Real-time Clock Action Widget */}
+            <div className="glass-strong rounded-3xl p-6 border border-white/5 shadow-2xl min-w-[300px]">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "h-3 w-3 rounded-full",
+                    isCheckedIn ? "bg-primary animate-pulse" : "bg-muted-foreground/30"
+                  )} />
+                  <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+                    Shift Status: {isCheckedIn ? "Active" : "Away"}
+                  </span>
+                </div>
+                <Timer className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div className="text-center space-y-4">
+                <div className="text-3xl font-black tabular-nums tracking-tighter">
+                  {isCheckedIn ? (checkInTime || "Just Started") : "00:00:00"}
+                </div>
+                <Button
+                  onClick={toggleCheckIn}
+                  disabled={isLoading}
+                  className={cn(
+                    "w-full h-12 rounded-2xl font-black text-sm transition-all duration-300 shadow-xl",
+                    isCheckedIn
+                      ? "bg-foreground text-background hover:bg-foreground/90 shadow-foreground/10"
+                      : "bg-primary hover:bg-primary/90 shadow-primary/20"
+                  )}
+                >
+                  {isLoading ? "Syncing..." : isCheckedIn ? "FINISH SHIFT" : "START WORKDAY"}
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Main Cards Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Today's Attendance Card */}
-          <DashboardCard title="Today's Attendance" icon={Clock} className="lg:col-span-1">
-            <div className="space-y-4">
-              {/* Clock In/Out Button */}
-              <Button
-                onClick={handleClockAction}
-                disabled={isLoading}
-                size="lg"
-                className={cn(
-                  "w-full h-14 text-base font-medium transition-all duration-300",
-                  isCheckedIn
-                    ? "bg-amber-500 hover:bg-amber-600 text-white"
-                    : "bg-primary hover:bg-primary/90"
-                )}
-              >
-                {isLoading ? (
-                  <span className="flex items-center gap-2">
-                    <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    Processing...
-                  </span>
-                ) : isCheckedIn ? (
-                  <span className="flex items-center gap-2">
-                    <LogOut className="h-5 w-5" />
-                    Check Out
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <LogIn className="h-5 w-5" />
-                    Check In
-                  </span>
-                )}
-              </Button>
-
-              {/* Time Display */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 rounded-lg bg-muted/50">
-                  <p className="text-xs text-muted-foreground mb-1">Check In</p>
-                  <p className="text-lg font-semibold text-foreground">{checkInTime || "—"}</p>
+        {/* 2. Personalized Performance Stats - Employee Centric */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            { label: 'Work Streak', value: '12', icon: Activity, color: 'primary', desc: 'Consecutive days present' },
+            { label: 'My Attendance', value: '98%', icon: CalendarCheck, color: 'primary', desc: 'Current month average' },
+            { label: 'Remaining Leave', value: (leaveBalance.paidLeave.total - leaveBalance.paidLeave.used + leaveBalance.sickLeave.total - leaveBalance.sickLeave.used).toString(), icon: UserX, color: 'muted-foreground', desc: 'Available time off' },
+            { label: 'Team Activity', value: '14/15', icon: Users, color: 'primary', desc: 'Engineering Dept present' },
+          ].map((stat, i) => (
+            <div key={i} className="group glass rounded-[2rem] p-6 border border-border/50 hover:border-primary/40 transition-all duration-500">
+              <div className="flex items-start justify-between mb-4">
+                <div className={cn(
+                  "h-12 w-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3 shadow-lg bg-primary/5 text-primary"
+                )}>
+                  <stat.icon className="h-6 w-6" />
                 </div>
-                <div className="p-3 rounded-lg bg-muted/50">
-                  <p className="text-xs text-muted-foreground mb-1">Check Out</p>
-                  <p className="text-lg font-semibold text-foreground">{checkOutTime || "—"}</p>
+                <div className="text-right">
+                  <span className="text-2xl font-black tracking-tighter">{stat.value}</span>
                 </div>
               </div>
-
-              {/* Today's Hours */}
-              <div className="flex items-center justify-between p-3 rounded-lg bg-primary/5 border border-primary/10">
-                <span className="text-sm text-muted-foreground">Today's Hours</span>
-                <span className="text-lg font-semibold text-primary">{todayAttendance.totalHours}</span>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-foreground opacity-80 uppercase tracking-wide">{stat.label}</h3>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase">{stat.desc}</p>
               </div>
             </div>
-          </DashboardCard>
+          ))}
+        </div>
 
-          {/* Work Hours Summary Card */}
-          <DashboardCard title="This Week's Hours" icon={TrendingUp} className="lg:col-span-1">
-            <div className="space-y-4">
-              {/* Weekly Chart */}
-              <div className="flex items-end justify-between gap-2 h-32">
-                {weeklyHours.map((day, index) => (
-                  <div key={day.day} className="flex-1 flex flex-col items-center gap-2">
-                    <div className="w-full flex flex-col items-center">
-                      <span className="text-xs font-medium text-foreground mb-1">
-                        {day.hours}h
-                      </span>
-                      <div
-                        className={cn(
-                          "w-full rounded-t-md transition-all duration-500",
-                          index === weeklyHours.length - 1
-                            ? "bg-primary"
-                            : "bg-primary/30"
-                        )}
-                        style={{
-                          height: `${(day.hours / maxHours) * 80}px`,
-                          animationDelay: `${index * 100}ms`,
-                        }}
-                      />
-                    </div>
-                    <span className="text-xs text-muted-foreground">{day.day}</span>
+        {/* 3. Operational Hub - Grouped by Function */}
+        <div className="grid lg:grid-cols-3 gap-8">
+
+          {/* Quick Actions - List style for readability */}
+          <div className="lg:col-span-1 space-y-6">
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground ml-2">Quick Navigation</h3>
+            <div className="grid gap-3">
+              {[
+                { title: 'Leave Management', desc: 'Secure digital requests', icon: FileCheck, color: 'primary', path: '/time-off' },
+                { title: 'Attendance Log', desc: 'Detailed shift history', icon: FileText, color: 'primary', path: '/attendance' },
+                { title: 'Team Directory', desc: 'Contact your colleagues', icon: Users, color: 'primary', path: '/profile' },
+              ].map((action, i) => (
+                <button
+                  key={i}
+                  onClick={() => navigate(action.path)}
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all group"
+                >
+                  <div className={cn(
+                    "h-10 w-10 rounded-xl flex items-center justify-center shrink-0 shadow-inner bg-primary/5 text-primary"
+                  )}>
+                    <action.icon className="h-5 w-5" />
                   </div>
-                ))}
-              </div>
-
-              {/* Total Hours */}
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <span className="text-sm text-muted-foreground">Total This Week</span>
-                <span className="text-lg font-semibold text-foreground">{totalWeeklyHours.toFixed(1)}h</span>
-              </div>
+                  <div className="text-left flex-1">
+                    <div className="text-sm font-black text-foreground">{action.title}</div>
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase">{action.desc}</div>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                </button>
+              ))}
             </div>
-          </DashboardCard>
+          </div>
 
-          {/* Leave Balance Card */}
-          <DashboardCard title="Leave Balance" icon={Calendar} className="lg:col-span-1">
-            <div className="space-y-4">
-              {/* Paid Leave */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground">Paid Leave</span>
-                  <span className="text-sm font-medium text-foreground">
-                    {leaveBalance.paidLeave.total - leaveBalance.paidLeave.used} / {leaveBalance.paidLeave.total} days
-                  </span>
-                </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full transition-all duration-500"
-                    style={{
-                      width: `${((leaveBalance.paidLeave.total - leaveBalance.paidLeave.used) / leaveBalance.paidLeave.total) * 100}%`,
-                    }}
-                  />
+          {/* Visualization Zone */}
+          <div className="lg:col-span-2">
+            <DashboardCard title="Performance Analytics" icon={TrendingUp} className="h-full">
+              <div className="h-64 mt-4 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart
+                    data={weeklyHours}
+                    margin={{ top: 20, right: 10, left: -20, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.1} />
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid
+                      vertical={false}
+                      strokeDasharray="4 4"
+                      stroke="currentColor"
+                      className="text-border/30"
+                    />
+                    <XAxis
+                      dataKey="day"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: 'currentColor', fontSize: 10, fontWeight: 700 }}
+                      className="text-muted-foreground uppercase opacity-50"
+                      dy={10}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: 'currentColor', fontSize: 10, fontWeight: 700 }}
+                      className="text-muted-foreground opacity-50"
+                      domain={[0, 12]}
+                    />
+                    <Tooltip
+                      cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '4 4' }}
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="glass-strong border border-white/10 px-4 py-3 rounded-2xl shadow-2xl">
+                              <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">
+                                {payload[0].payload.day} Metrics
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <div className="h-2 w-2 rounded-full bg-primary" />
+                                <p className="text-sm font-black text-foreground">
+                                  {payload[0].value} Work Hours
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="hours"
+                      stroke="none"
+                      fillOpacity={1}
+                      fill="url(#colorHours)"
+                      animationDuration={1500}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="hours"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={3}
+                      dot={{ fill: 'hsl(var(--background))', stroke: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6, strokeWidth: 0, fill: 'hsl(var(--primary))' }}
+                      animationDuration={1500}
+                    />
+                    <ReferenceLine y={8} stroke="currentColor" className="text-foreground/10" strokeDasharray="3 3 label" />
+                  </ComposedChart>
+                </ResponsiveContainer>
+
+                <div className="pt-6 border-t border-border/40 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1 w-4 rounded-full bg-primary" />
+                    <span>Utilization Trend</span>
+                  </div>
+                  <span className="text-foreground/40 font-bold uppercase">Archive: Q1 2026</span>
                 </div>
               </div>
-
-              {/* Sick Leave */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground">Sick Leave</span>
-                  <span className="text-sm font-medium text-foreground">
-                    {leaveBalance.sickLeave.total - leaveBalance.sickLeave.used} / {leaveBalance.sickLeave.total} days
-                  </span>
-                </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-amber-500 rounded-full transition-all duration-500"
-                    style={{
-                      width: `${((leaveBalance.sickLeave.total - leaveBalance.sickLeave.used) / leaveBalance.sickLeave.total) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Personal Leave */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground">Personal Leave</span>
-                  <span className="text-sm font-medium text-foreground">
-                    {leaveBalance.personalLeave.total - leaveBalance.personalLeave.used} / {leaveBalance.personalLeave.total} days
-                  </span>
-                </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-violet-500 rounded-full transition-all duration-500"
-                    style={{
-                      width: `${((leaveBalance.personalLeave.total - leaveBalance.personalLeave.used) / leaveBalance.personalLeave.total) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Summary */}
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-sm text-emerald-700 dark:text-emerald-400">
-                  {leaveBalance.paidLeave.total - leaveBalance.paidLeave.used + leaveBalance.sickLeave.total - leaveBalance.sickLeave.used + leaveBalance.personalLeave.total - leaveBalance.personalLeave.used} days remaining
-                </span>
-              </div>
-            </div>
-          </DashboardCard>
+            </DashboardCard>
+          </div>
         </div>
+
+        {/* 4. Support & Resource Footer */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="glass rounded-3xl p-6 border border-border/50 flex items-center gap-6">
+            <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+              <Calendar className="h-7 w-7 text-primary" />
+            </div>
+            <div>
+              <h4 className="text-sm font-black text-foreground uppercase tracking-wide">Upcoming Holiday</h4>
+              <p className="text-xs text-muted-foreground font-medium">Republic Day — January 26, 2026</p>
+            </div>
+          </div>
+          <div className="glass rounded-3xl p-6 border border-border/50 flex items-center gap-6">
+            <div className="h-14 w-14 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0">
+              <Sparkles className="h-7 w-7 text-primary" />
+            </div>
+            <div>
+              <h4 className="text-sm font-black text-foreground uppercase tracking-wide">Work Anniversary</h4>
+              <p className="text-xs text-muted-foreground font-medium">3 years with Dayflow on March 15!</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </AppLayout>
   );

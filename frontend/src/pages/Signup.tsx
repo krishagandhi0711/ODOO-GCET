@@ -129,7 +129,7 @@ export default function Signup() {
                                         <Input
                                             id="firstName"
                                             type="text"
-                                            placeholder="John"
+                                            placeholder="Krisha"
                                             value={formData.firstName}
                                             onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                                             disabled={isLoading}
@@ -145,7 +145,7 @@ export default function Signup() {
                                     <Input
                                         id="lastName"
                                         type="text"
-                                        placeholder="Doe"
+                                        placeholder="Gandhi"
                                         value={formData.lastName}
                                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                                         disabled={isLoading}
@@ -163,7 +163,7 @@ export default function Signup() {
                                     <Input
                                         id="email"
                                         type="email"
-                                        placeholder="john.doe@company.com"
+                                        placeholder="krisha.gandhi@company.com"
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                         disabled={isLoading}
