@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Plus } from 'lucide-react';
 import { employees, departments, Employee } from '@/data/mockData';
 import { EmployeeTable } from '@/components/admin/employees/EmployeeTable';
 import { EmployeeDetailPanel } from '@/components/admin/employees/EmployeeDetailPanel';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { Button } from '@/components/ui/button';
 
 export default function AdminEmployees() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,12 +35,19 @@ export default function AdminEmployees() {
     <AppLayout title="Employee Management">
       <div className="space-y-6 animate-fade-in">
         {/* Page Header */}
-        <div className="border-b border-border/40 pb-6">
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Employees</h1>
-          <p className="text-sm text-muted-foreground mt-2">
-            Manage and view all employee information
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Employees</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Manage and view all employee information
+            </p>
+          </div>
+          <Button className="w-full sm:w-auto flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add Employee
+          </Button>
         </div>
+
 
         {/* Stats Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -169,6 +177,6 @@ export default function AdminEmployees() {
           />
         )}
       </div>
-    </AppLayout>
+    </AppLayout >
   );
 }

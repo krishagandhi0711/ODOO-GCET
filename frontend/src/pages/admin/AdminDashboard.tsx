@@ -1,20 +1,35 @@
-import { Users, UserCheck, CalendarOff, ClipboardList } from 'lucide-react';
+import { Users, UserCheck, CalendarOff, ClipboardList, Plus, UserPlus } from 'lucide-react';
 import { StatCard } from '@/components/admin/dashboard/StatCard';
 import { WorkforceStatus } from '@/components/admin/dashboard/WorkforceStatus';
 import { PendingApprovals } from '@/components/admin/dashboard/PendingApprovals';
 import { dashboardStats } from '@/data/mockData';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+
   return (
     <AppLayout title="Admin Dashboard">
       <div className="space-y-6 animate-fade-in">
         {/* Page Header */}
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Welcome back. Here's your organization at a glance.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Welcome back. Here's your organization at a glance.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => navigate('/admin/employees')}
+              className="flex items-center gap-2"
+            >
+              <UserPlus className="h-4 w-4" />
+              Create Employee
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
