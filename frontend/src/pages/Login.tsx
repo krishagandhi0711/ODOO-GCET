@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { setRole } = useAuth();
+  const { login } = useAuth();
   const [searchParams] = useSearchParams();
   const resetSuccess = searchParams.get("reset") === "success";
 
@@ -36,31 +36,25 @@ export default function Login() {
     setError(null);
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      // Validate input
+      if (!formData.identifier || !formData.password) {
+        setError("Please enter your credentials");
+        setIsLoading(false);
+        return;
+      }
 
-    // Demo validation
-    if (!formData.identifier || !formData.password) {
-      setError("Please enter your credentials");
+      // Call real login API
+      await login(formData.identifier, formData.password);
+
+      // Navigate based on user role
+      const userRole = localStorage.getItem('dayflow-user-role');
+      navigate(userRole === 'admin' ? '/admin/dashboard' : '/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Invalid email or password');
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    // Demo: check for first-time login
-    if (formData.password === "changeme") {
-      setIsLoading(false);
-      navigate("/first-time-login");
-      return;
-    }
-
-    // Determine role based on identifier (mock logic)
-    const isLoginAdmin = formData.identifier.toLowerCase().includes("admin");
-    const role = isLoginAdmin ? "admin" : "employee";
-    setRole(role);
-
-    // Demo success
-    setIsLoading(false);
-    navigate(role === "admin" ? "/admin/dashboard" : "/dashboard");
   };
 
   return (

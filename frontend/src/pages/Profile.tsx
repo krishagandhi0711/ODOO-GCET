@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { currentEmployee } from "@/data/mockData";
+import { employeeService } from "@/services/employee.service";
+import { toastService } from "@/services/toast.service";
+import type { Employee } from "@/types/api.types";
 import { cn } from "@/lib/utils";
 import {
   User,
@@ -21,7 +23,8 @@ import {
   EyeOff,
   ShieldCheck,
   AlertCircle,
-  Clock
+  Clock,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -35,6 +38,53 @@ const tabs = [
 
 export default function Profile() {
   const [activeTab, setActiveTab] = useState("personal");
+  const [employee, setEmployee] = useState<Employee | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchEmployeeData();
+  }, []);
+
+  const fetchEmployeeData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await employeeService.getMyProfile();
+      setEmployee(data);
+    } catch (error: any) {
+      toastService.error(error.message || 'Failed to load profile');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <AppLayout title="My Profile">
+        <div className="flex items-center justify-center h-96">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (!employee) {
+    return (
+      <AppLayout title="My Profile">
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">Failed to load profile</p>
+            <Button onClick={fetchEmployeeData} className="mt-4">
+              Retry
+            </Button>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  const fullName = `${employee.first_name} ${employee.last_name}`;
+  const initials = `${employee.first_name[0]}${employee.last_name[0]}`;
 
   return (
     <AppLayout title="My Profile">
@@ -52,7 +102,7 @@ export default function Profile() {
               <div className="px-6 pb-6 -mt-12">
                 <div className="relative inline-block">
                   <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center text-slate-800 dark:text-white text-3xl font-bold shadow-lg border-4 border-background mx-auto">
-                    {currentEmployee.firstName[0]}{currentEmployee.lastName[0]}
+                    {initials}
                   </div>
                   {/* Verified Badge */}
                   <div className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-emerald-500/30 dark:bg-emerald-500/20 border-2 border-emerald-500/40 dark:border-emerald-500/30 flex items-center justify-center backdrop-blur-sm">
@@ -61,8 +111,8 @@ export default function Profile() {
                 </div>
 
                 <div className="text-center mt-4">
-                  <h2 className="text-xl font-semibold text-foreground">{currentEmployee.fullName}</h2>
-                  <p className="text-muted-foreground mt-1">{currentEmployee.role}</p>
+                  <h2 className="text-xl font-semibold text-foreground">{fullName}</h2>
+                  <p className="text-muted-foreground mt-1">{employee.designation || 'Employee'}</p>
 
                   {/* Status Chip */}
                   <div className="flex items-center justify-center gap-2 mt-3">
@@ -71,7 +121,7 @@ export default function Profile() {
                       Active
                     </span>
                     <span className="px-3 py-1 rounded-full bg-blue-500/20 dark:bg-blue-500/10 border border-blue-500/30 dark:border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-medium">
-                      Full Time
+                      {employee.employment_type || 'Full Time'}
                     </span>
                   </div>
                 </div>
@@ -80,33 +130,38 @@ export default function Profile() {
                 <div className="mt-6 p-4 rounded-xl bg-slate-100/80 dark:bg-slate-800/30 border border-slate-200 dark:border-white/5">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-medium text-muted-foreground">Profile Completion</span>
-                    <span className="text-xs font-semibold text-foreground">92%</span>
+                    <span className="text-xs font-semibold text-foreground">
+                      {calculateProfileCompletion(employee)}%
+                    </span>
                   </div>
                   <div className="h-1.5 bg-slate-200 dark:bg-slate-800/50 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full" style={{ width: '92%' }} />
+                    <div className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full" style={{ width: `${calculateProfileCompletion(employee)}%` }} />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">Complete your skills section</p>
                 </div>
 
                 <div className="mt-6 space-y-3">
-                  <div className="flex items-center gap-3 text-sm">
-                    <Building className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-foreground">{currentEmployee.department}</span>
-                  </div>
+                  {employee.department && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <Building className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-foreground">{employee.department}</span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-3 text-sm">
                     <Users className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-foreground">{currentEmployee.company}</span>
+                    <span className="text-foreground">Company</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-foreground">{currentEmployee.office}</span>
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-foreground">
+                      Joined {new Date(employee.date_of_joining).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                    </span>
                   </div>
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-slate-200 dark:border-white/5">
                   <div className="text-xs text-muted-foreground mb-2">Employee ID</div>
                   <div className="text-sm font-mono text-foreground bg-slate-100/80 dark:bg-slate-800/30 rounded-lg px-3 py-2 border border-slate-200 dark:border-white/5">
-                    {currentEmployee.id}
+                    {employee.employee_code}
                   </div>
                 </div>
 
@@ -147,8 +202,8 @@ export default function Profile() {
 
             {/* Tab Content */}
             <div className="p-6 animate-fade-in">
-              {activeTab === "personal" && <PersonalTab />}
-              {activeTab === "professional" && <ProfessionalTab />}
+              {activeTab === "personal" && <PersonalTab employee={employee} />}
+              {activeTab === "professional" && <ProfessionalTab employee={employee} />}
               {activeTab === "skills" && <SkillsTab />}
               {activeTab === "documents" && <DocumentsTab />}
               {activeTab === "payroll" && <PayrollTab />}
@@ -160,7 +215,26 @@ export default function Profile() {
   );
 }
 
-function PersonalTab() {
+// Helper function to calculate profile completion
+function calculateProfileCompletion(employee: Employee): number {
+  const fields = [
+    employee.first_name,
+    employee.last_name,
+    employee.email,
+    employee.phone_number,
+    employee.date_of_birth,
+    employee.gender,
+    employee.address,
+    employee.department,
+    employee.designation,
+    employee.employment_type,
+  ];
+  
+  const filledFields = fields.filter(field => field && field.trim().length > 0).length;
+  return Math.round((filledFields / fields.length) * 100);
+}
+
+function PersonalTab({ employee }: { employee: Employee }) {
   return (
     <div className="space-y-6">
       {/* Public Information Section */}
@@ -170,9 +244,9 @@ function PersonalTab() {
           <span className="text-xs text-muted-foreground">• Visible to team members</span>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <InfoField label="Full Name" value={currentEmployee.fullName} icon={User} />
-          <InfoField label="Email" value={currentEmployee.email} icon={Mail} />
-          <InfoField label="Phone" value={currentEmployee.phone} icon={Phone} />
+          <InfoField label="Full Name" value={`${employee.first_name} ${employee.last_name}`} icon={User} />
+          <InfoField label="Email" value={employee.email} icon={Mail} />
+          <InfoField label="Phone" value={employee.phone_number || 'Not provided'} icon={Phone} />
         </div>
       </div>
 
@@ -184,9 +258,14 @@ function PersonalTab() {
           <span className="text-xs text-amber-600 dark:text-amber-400/80">• HR Only</span>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <InfoField label="Date of Birth" value={new Date(currentEmployee.dateOfBirth).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} icon={Calendar} isPrivate />
-          <InfoField label="Gender" value={currentEmployee.gender} icon={User} isPrivate />
-          <InfoField label="Address" value={currentEmployee.address} icon={MapPin} className="sm:col-span-2" isPrivate />
+          <InfoField 
+            label="Date of Birth" 
+            value={employee.date_of_birth ? new Date(employee.date_of_birth).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : 'Not provided'} 
+            icon={Calendar} 
+            isPrivate 
+          />
+          <InfoField label="Gender" value={employee.gender || 'Not provided'} icon={User} isPrivate />
+          <InfoField label="Address" value={employee.address || 'Not provided'} icon={MapPin} className="sm:col-span-2" isPrivate />
         </div>
       </div>
 

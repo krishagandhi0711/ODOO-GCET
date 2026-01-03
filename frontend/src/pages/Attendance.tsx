@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { DashboardCard } from "@/components/DashboardCard";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -11,38 +11,59 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
-import { attendanceHistory, todayAttendance } from "@/data/mockData";
 import { cn } from "@/lib/utils";
+import { useAttendance } from "@/contexts/AttendanceContext";
+import { attendanceService } from "@/services/attendance.service";
+import type { Attendance, AttendanceStatistics } from "@/types/api.types";
 
 type ViewMode = "daily" | "weekly" | "monthly";
 
 export default function Attendance() {
-  const [isCheckedIn, setIsCheckedIn] = useState(todayAttendance.isCheckedIn);
-  const [checkInTime, setCheckInTime] = useState(todayAttendance.checkIn);
-  const [checkOutTime, setCheckOutTime] = useState<string | null>(todayAttendance.checkOut);
-  const [isLoading, setIsLoading] = useState(false);
+  const { isCheckedIn, checkInTime, checkOutTime, isLoading, totalHours, toggleCheckIn } = useAttendance();
   const [viewMode, setViewMode] = useState<ViewMode>("daily");
+  const [history, setHistory] = useState<Attendance[]>([]);
+  const [statistics, setStatistics] = useState<AttendanceStatistics | null>(null);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [historyData, statsData] = await Promise.all([
+          attendanceService.getHistory(30),
+          attendanceService.getStatistics()
+        ]);
+        setHistory(historyData);
+        setStatistics(statsData);
+      } catch (error) {
+        console.error('Failed to fetch attendance data:', error);
+      } finally {
+        setLoadingHistory(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleClockAction = async () => {
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    if (isCheckedIn) {
-      const now = new Date();
-      setCheckOutTime(now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }));
-      setIsCheckedIn(false);
-    } else {
-      const now = new Date();
-      setCheckInTime(now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }));
-      setCheckOutTime(null);
-      setIsCheckedIn(true);
+    try {
+      await toggleCheckIn();
+      // Refresh history after check-in/out
+      const historyData = await attendanceService.getHistory(30);
+      setHistory(historyData);
+    } catch (error: any) {
+      console.error('Clock action failed:', error);
     }
-    setIsLoading(false);
   };
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  };
+
+  const formatTime = (isoString: string): string => {
+    if (!isoString) return "—";
+    const date = new Date(isoString);
+    return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
   };
 
   return (
@@ -108,7 +129,7 @@ export default function Attendance() {
             {/* Today's Hours */}
             <div className="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/10 text-center">
               <p className="text-sm text-muted-foreground mb-1">Today's Total Hours</p>
-              <p className="text-3xl font-bold text-primary">{todayAttendance.totalHours}</p>
+              <p className="text-3xl font-bold text-primary">{totalHours}</p>
             </div>
           </div>
 
@@ -128,10 +149,10 @@ export default function Attendance() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <StatCard label="Days Present" value="18" color="emerald" />
-              <StatCard label="Days Absent" value="0" color="red" />
-              <StatCard label="On Leave" value="2" color="amber" />
-              <StatCard label="Total Hours" value="156h" color="primary" />
+              <StatCard label="Days Present" value={statistics?.presentDays.toString() || "0"} color="emerald" />
+              <StatCard label="Days Absent" value={statistics?.absentDays.toString() || "0"} color="red" />
+              <StatCard label="On Leave" value={statistics?.leaveDays.toString() || "0"} color="amber" />
+              <StatCard label="Total Hours" value={statistics ? `${statistics.averageHours.toFixed(0)}h` : "0h"} color="primary" />
             </div>
 
             {/* Mini Calendar View */}
@@ -217,31 +238,47 @@ export default function Attendance() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {attendanceHistory.map((record, index) => (
-                  <tr
-                    key={record.date}
-                    className="hover:bg-muted/30 transition-colors animate-fade-in"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-foreground">
-                        {formatDate(record.date)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-foreground">{record.checkIn}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-foreground">{record.checkOut}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-foreground">{record.totalHours}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <StatusBadge status={record.status as any} />
+                {loadingHistory ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
+                      Loading attendance history...
                     </td>
                   </tr>
-                ))}
+                ) : history.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
+                      No attendance records found
+                    </td>
+                  </tr>
+                ) : (
+                  history.map((record, index) => (
+                    <tr
+                      key={record.id}
+                      className="hover:bg-muted/30 transition-colors animate-fade-in"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-medium text-foreground">
+                          {formatDate(record.date)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-foreground">{formatTime(record.check_in)}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-foreground">{record.check_out ? formatTime(record.check_out) : "—"}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-medium text-foreground">
+                          {record.total_hours ? `${record.total_hours.toFixed(1)}h` : "—"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <StatusBadge status={record.status.toLowerCase() as any} />
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
