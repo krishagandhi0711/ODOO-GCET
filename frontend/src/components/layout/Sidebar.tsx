@@ -11,6 +11,7 @@ import {
   UserCircle,
   ChevronLeft,
   ChevronRight,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -35,6 +36,7 @@ const adminNavItems = [
   { to: "/admin/employees", label: "Employees", icon: Users },
   { to: "/admin/leave-approvals", label: "Leave Approvals", icon: CalendarCheck },
   { to: "/admin/payroll", label: "Payroll", icon: DollarSign },
+  { to: "/admin/company", label: "Company", icon: Building2 },
 ];
 
 export function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {

@@ -18,6 +18,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminEmployees from "./pages/admin/AdminEmployees";
 import AdminLeaveApprovals from "./pages/admin/AdminLeaveApprovals";
 import AdminPayroll from "./pages/admin/AdminPayroll";
+import AdminCompany from "./pages/admin/AdminCompany";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,6 +52,7 @@ const App = () => (
                   <Route path="/admin/employees" element={<AdminEmployees />} />
                   <Route path="/admin/leave-approvals" element={<AdminLeaveApprovals />} />
                   <Route path="/admin/payroll" element={<AdminPayroll />} />
+                  <Route path="/admin/company" element={<AdminCompany />} />
                 </Route>
 
                 {/* Catch-all */}

@@ -15,15 +15,15 @@ export default function AdminEmployees() {
 
   const filteredEmployees = useMemo(() => {
     return employees.filter((employee) => {
-      const matchesSearch = 
+      const matchesSearch =
         employee.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         employee.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         employee.email.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesDepartment = 
+
+      const matchesDepartment =
         selectedDepartment === 'All' || employee.department === selectedDepartment;
-      
-      const matchesStatus = 
+
+      const matchesStatus =
         selectedStatus === 'all' || employee.status === selectedStatus;
 
       return matchesSearch && matchesDepartment && matchesStatus;
@@ -34,11 +34,75 @@ export default function AdminEmployees() {
     <AppLayout title="Employee Management">
       <div className="space-y-6 animate-fade-in">
         {/* Page Header */}
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Employees</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+        <div className="border-b border-border/40 pb-6">
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Employees</h1>
+          <p className="text-sm text-muted-foreground mt-2">
             Manage and view all employee information
           </p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="glass rounded-xl p-6 hover-lift transition-all duration-300">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground font-medium mb-2">
+                  Total Employees
+                </p>
+                <h3 className="text-3xl font-bold text-foreground tracking-tight">
+                  {employees.length}
+                </h3>
+              </div>
+              <div className="p-3 rounded-lg bg-blue-500/10">
+                <Search className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+          </div>
+          <div className="glass rounded-xl p-6 hover-lift transition-all duration-300">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground font-medium mb-2">
+                  Present Today
+                </p>
+                <h3 className="text-3xl font-bold text-foreground tracking-tight">
+                  {employees.filter(e => e.status === 'present').length}
+                </h3>
+              </div>
+              <div className="p-3 rounded-lg bg-emerald-500/10">
+                <Filter className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+            </div>
+          </div>
+          <div className="glass rounded-xl p-6 hover-lift transition-all duration-300">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground font-medium mb-2">
+                  On Leave
+                </p>
+                <h3 className="text-3xl font-bold text-foreground tracking-tight">
+                  {employees.filter(e => e.status === 'on-leave').length}
+                </h3>
+              </div>
+              <div className="p-3 rounded-lg bg-amber-500/10">
+                <Filter className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+              </div>
+            </div>
+          </div>
+          <div className="glass rounded-xl p-6 hover-lift transition-all duration-300">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground font-medium mb-2">
+                  Departments
+                </p>
+                <h3 className="text-3xl font-bold text-foreground tracking-tight">
+                  {departments.length - 1}
+                </h3>
+              </div>
+              <div className="p-3 rounded-lg bg-purple-500/10">
+                <Filter className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Filters */}
@@ -99,9 +163,9 @@ export default function AdminEmployees() {
 
         {/* Employee Detail Panel */}
         {selectedEmployee && (
-          <EmployeeDetailPanel 
-            employee={selectedEmployee} 
-            onClose={() => setSelectedEmployee(null)} 
+          <EmployeeDetailPanel
+            employee={selectedEmployee}
+            onClose={() => setSelectedEmployee(null)}
           />
         )}
       </div>

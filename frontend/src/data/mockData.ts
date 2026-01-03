@@ -396,3 +396,66 @@ export const dashboardStats = {
   onLeave: employees.filter(e => e.status === 'on-leave').length,
   pendingRequests: leaveRequests.filter(l => l.status === 'pending').length
 };
+
+// Company Information
+export const companyInfo = {
+  name: 'Dayflow Technologies',
+  industry: 'Enterprise Software',
+  location: 'San Francisco, CA',
+  totalEmployees: 156,
+  foundedYear: 2018,
+  website: 'www.dayflow.com'
+};
+
+// Department Statistics
+export interface DepartmentStat {
+  name: string;
+  employeeCount: number;
+  color: string;
+}
+
+export const departmentStats: DepartmentStat[] = [
+  { name: 'Engineering', employeeCount: 45, color: 'hsl(210, 100%, 50%)' },
+  { name: 'Product Design', employeeCount: 28, color: 'hsl(280, 70%, 55%)' },
+  { name: 'Human Resources', employeeCount: 12, color: 'hsl(160, 60%, 50%)' },
+  { name: 'Marketing', employeeCount: 18, color: 'hsl(30, 80%, 55%)' },
+  { name: 'Executive', employeeCount: 8, color: 'hsl(340, 75%, 55%)' },
+  { name: 'Sales', employeeCount: 22, color: 'hsl(200, 70%, 50%)' },
+  { name: 'Finance', employeeCount: 15, color: 'hsl(120, 60%, 45%)' },
+  { name: 'Operations', employeeCount: 8, color: 'hsl(260, 65%, 55%)' }
+];
+
+// Locations
+export interface Location {
+  id: string;
+  city: string;
+  country: string;
+  employeeCount: number;
+}
+
+export const locations: Location[] = [
+  { id: '1', city: 'San Francisco', country: 'USA', employeeCount: 85 },
+  { id: '2', city: 'New York', country: 'USA', employeeCount: 42 },
+  { id: '3', city: 'London', country: 'UK', employeeCount: 18 },
+  { id: '4', city: 'Singapore', country: 'Singapore', employeeCount: 11 }
+];
+
+// Company Policies
+export const companyPolicies = {
+  workingHours: {
+    hoursPerWeek: 40,
+    flexible: true,
+    description: '40 hours per week, flexible timing'
+  },
+  leavePolicy: {
+    paidLeaves: 20,
+    sickLeaves: 10,
+    casualLeaves: 5,
+    description: '20 paid leaves, 10 sick leaves, 5 casual leaves per year'
+  }
+};
+
+// Attendance Rate Calculation
+export const attendanceRate = Math.round(
+  (employees.filter(e => e.status === 'present').length / employees.length) * 100
+);

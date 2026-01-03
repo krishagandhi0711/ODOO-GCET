@@ -11,8 +11,8 @@ export default function AdminLeaveApprovals() {
   const [typeFilter, setTypeFilter] = useState('all');
 
   const handleUpdateRequest = (id: string, status: 'approved' | 'rejected') => {
-    setRequests(prev => 
-      prev.map(req => 
+    setRequests(prev =>
+      prev.map(req =>
         req.id === id ? { ...req, status } : req
       )
     );
@@ -37,56 +37,72 @@ export default function AdminLeaveApprovals() {
     <AppLayout title="Leave Approvals">
       <div className="space-y-6 animate-fade-in">
         {/* Page Header */}
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Leave Approvals</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+        <div className="border-b border-border/40 pb-6">
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Leave Approvals</h1>
+          <p className="text-sm text-muted-foreground mt-2">
             Review and manage employee leave requests
           </p>
         </div>
 
         {/* Stats Overview */}
-        <div className="grid gap-4 sm:grid-cols-4">
-          <div className="rounded-xl border border-border bg-card p-4 shadow-soft">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg p-2 bg-muted">
-                <CalendarCheck size={18} className="text-muted-foreground" />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="glass rounded-xl p-6 hover-lift transition-all duration-300">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground font-medium mb-2">
+                  Total Requests
+                </p>
+                <h3 className="text-3xl font-bold text-foreground tracking-tight">
+                  {stats.total}
+                </h3>
               </div>
-              <div>
-                <p className="text-2xl font-semibold text-card-foreground">{stats.total}</p>
-                <p className="text-xs text-muted-foreground">Total Requests</p>
-              </div>
-            </div>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4 shadow-soft">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg p-2 bg-warning/10">
-                <Clock size={18} className="text-warning" />
-              </div>
-              <div>
-                <p className="text-2xl font-semibold text-card-foreground">{stats.pending}</p>
-                <p className="text-xs text-muted-foreground">Pending</p>
+              <div className="p-3 rounded-lg bg-blue-500/10">
+                <CalendarCheck className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
           </div>
-          <div className="rounded-xl border border-border bg-card p-4 shadow-soft">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg p-2 bg-success/10">
-                <CheckCircle size={18} className="text-success" />
+          <div className="glass rounded-xl p-6 hover-lift transition-all duration-300">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground font-medium mb-2">
+                  Pending
+                </p>
+                <h3 className="text-3xl font-bold text-foreground tracking-tight">
+                  {stats.pending}
+                </h3>
               </div>
-              <div>
-                <p className="text-2xl font-semibold text-card-foreground">{stats.approved}</p>
-                <p className="text-xs text-muted-foreground">Approved</p>
+              <div className="p-3 rounded-lg bg-amber-500/10">
+                <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
               </div>
             </div>
           </div>
-          <div className="rounded-xl border border-border bg-card p-4 shadow-soft">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg p-2 bg-destructive/10">
-                <XCircle size={18} className="text-destructive" />
+          <div className="glass rounded-xl p-6 hover-lift transition-all duration-300">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground font-medium mb-2">
+                  Approved
+                </p>
+                <h3 className="text-3xl font-bold text-foreground tracking-tight">
+                  {stats.approved}
+                </h3>
               </div>
-              <div>
-                <p className="text-2xl font-semibold text-card-foreground">{stats.rejected}</p>
-                <p className="text-xs text-muted-foreground">Rejected</p>
+              <div className="p-3 rounded-lg bg-emerald-500/10">
+                <CheckCircle className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+            </div>
+          </div>
+          <div className="glass rounded-xl p-6 hover-lift transition-all duration-300">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground font-medium mb-2">
+                  Rejected
+                </p>
+                <h3 className="text-3xl font-bold text-foreground tracking-tight">
+                  {stats.rejected}
+                </h3>
+              </div>
+              <div className="p-3 rounded-lg bg-red-500/10">
+                <XCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
               </div>
             </div>
           </div>
@@ -105,7 +121,7 @@ export default function AdminLeaveApprovals() {
               <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
           </Select>
-          
+
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-[160px]">
               <SelectValue placeholder="Leave Type" />
@@ -119,7 +135,7 @@ export default function AdminLeaveApprovals() {
             </SelectContent>
           </Select>
         </div>
-        
+
         {/* Leave Requests Table */}
         <LeaveRequestsTable requests={filteredRequests} onUpdate={handleUpdateRequest} />
       </div>
